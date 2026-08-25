@@ -19,8 +19,8 @@ configuration_options =
         options =
         {
             { description = "关闭", data = "off", hover = "不进行补偿。" },
-            { description = "自动：陨石地形可疑石头", data = "auto_boulder", hover = "关闭陨石时，在陨石地形生成一个可疑月岩矿。" },
-            { description = "总是：陨石地形可疑石头", data = "always_boulder", hover = "无论陨石设置如何，都在陨石地形生成一个可疑月岩矿。" },
+            { description = "自动：可疑石头", data = "auto_boulder", hover = "关闭陨石时，优先在陨石地形生成可疑月岩矿；找不到则在出生门附近生成。" },
+            { description = "总是：可疑石头", data = "always_boulder", hover = "优先在陨石地形生成可疑月岩矿；找不到则在出生门附近生成。" },
         },
         default = "auto_boulder",
     },
@@ -37,40 +37,14 @@ configuration_options =
         default = "auto_clue",
     },
     {
-        name = "lunar_warg_disable_summons",
-        label = "补偿座狼禁召小狼",
-        hover = "月化踪迹生成的变异座狼是否禁止召唤小狼，避免成为刷资源入口。",
-        options =
-        {
-            { description = "开启", data = true, hover = "推荐。补偿座狼不召唤小狼。" },
-            { description = "关闭", data = false, hover = "保留原版变异座狼召唤行为。" },
-        },
-        default = true,
-    },
-    {
         name = "beefalo_hunt_surprise",
         label = "皮弗娄牛狩猎惊喜",
-        hover = "春天雨天，狩猎终点位于稀树草原时，有概率出现皮弗娄牛。",
+        hover = "春天雨天，狩猎终点位于稀树草原时，按电羊世界设置的概率出现皮弗娄牛。",
         options =
         {
-            { description = "关闭", data = "off", hover = "不调整狩猎惊喜。" },
-            { description = "替换考拉象", data = "replace", hover = "有概率把草原狩猎终点的考拉象替换为皮弗娄牛。" },
-            { description = "额外生成", data = "add", hover = "有概率在考拉象旁额外生成一头皮弗娄牛。" },
+            { description = "开启", data = true, hover = "按电羊设置概率，把草原狩猎终点的考拉象替换为皮弗娄牛。" },
+            { description = "关闭", data = false, hover = "不调整狩猎惊喜。" },
         },
-        default = "replace",
-    },
-    {
-        name = "beefalo_hunt_chance",
-        label = "皮弗娄牛概率",
-        hover = "皮弗娄牛狩猎惊喜触发概率。",
-        options =
-        {
-            { description = "5%", data = 0.05 },
-            { description = "10%", data = 0.10 },
-            { description = "25%", data = 0.25 },
-            { description = "50%", data = 0.50 },
-            { description = "100%", data = 1.00 },
-        },
-        default = 0.25,
+        default = true,
     },
 }

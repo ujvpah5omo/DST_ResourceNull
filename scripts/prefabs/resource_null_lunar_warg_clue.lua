@@ -16,14 +16,6 @@ local function GetVerb()
     return "INVESTIGATE"
 end
 
-local function DisableWargSummons(warg)
-    if TUNING.RESOURCE_NULL_FIX_DISABLE_LUNAR_WARG_SUMMONS then
-        warg.NumHoundsToSpawn = function()
-            return 0
-        end
-    end
-end
-
 local function GetDirectedSpawnPoint(inst)
     if inst.resource_null_lunar_warg_spawn_x ~= nil then
         return Vector3(
@@ -57,6 +49,7 @@ local function OnSave(inst, data)
     data.resource_null_lunar_warg_spawn_x = inst.resource_null_lunar_warg_spawn_x
     data.resource_null_lunar_warg_spawn_y = inst.resource_null_lunar_warg_spawn_y
     data.resource_null_lunar_warg_spawn_z = inst.resource_null_lunar_warg_spawn_z
+    data.resource_null_lunar_rift_guid = inst.resource_null_lunar_rift_guid
 end
 
 local function OnLoad(inst, data)
@@ -67,6 +60,7 @@ local function OnLoad(inst, data)
     inst.resource_null_lunar_warg_spawn_x = data.resource_null_lunar_warg_spawn_x
     inst.resource_null_lunar_warg_spawn_y = data.resource_null_lunar_warg_spawn_y
     inst.resource_null_lunar_warg_spawn_z = data.resource_null_lunar_warg_spawn_z
+    inst.resource_null_lunar_rift_guid = data.resource_null_lunar_rift_guid
 end
 
 local function OnInvestigated(inst, doer)
@@ -85,7 +79,7 @@ local function OnInvestigated(inst, doer)
         end
 
         warg:AddTag("resource_null_lunar_warg_fix")
-        DisableWargSummons(warg)
+        warg.resource_null_lunar_rift_guid = inst.resource_null_lunar_rift_guid
 
         if doer ~= nil
             and doer:IsValid()
@@ -97,6 +91,7 @@ local function OnInvestigated(inst, doer)
     local worldstate = TheWorld ~= nil and TheWorld.components.resource_null_worldstate or nil
     if worldstate ~= nil then
         worldstate.lunar_warg_clue_used_count = (worldstate.lunar_warg_clue_used_count or 0) + 1
+        worldstate:MarkLunarWargRift(inst.resource_null_lunar_rift_guid, "used")
     end
 end
 

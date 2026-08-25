@@ -8,11 +8,18 @@ PrefabFiles =
 _G.STRINGS.NAMES.RESOURCE_NULL_LUNAR_WARG_CLUE = "月化踪迹"
 _G.STRINGS.CHARACTERS.GENERIC.DESCRIBE.RESOURCE_NULL_LUNAR_WARG_CLUE = "这些痕迹不该出现在这里。"
 
-_G.TUNING.RESOURCE_NULL_FIX_DISABLE_LUNAR_WARG_SUMMONS =
-    GetModConfigData("lunar_warg_disable_summons")
-
 local WORLD_SCAN_RADIUS = 10000
 local METEOR_TILE_ATTEMPTS = 1500
+
+local LIGHTNING_GOAT_HUNT_CHANCES =
+{
+    never = 0,
+    none = 0,
+    rare = 0.10,
+    default = 0.25,
+    often = 0.50,
+    always = 1,
+}
 
 local function IsMasterSim()
     return _G.TheWorld ~= nil and _G.TheWorld.ismastersim
@@ -64,6 +71,15 @@ end
 local function HuntsAreDisabled()
     return AnyOverrideIsNever("hunt", "alternatehunt")
         or _G.TUNING.HUNT_ENABLED == false
+end
+
+local function GetLightningGoatHuntChance()
+    local value = GetOverride("lightninggoat")
+    if type(value) == "number" then
+        return math.max(0, math.min(1, value))
+    end
+
+    return LIGHTNING_GOAT_HUNT_CHANCES[value] or LIGHTNING_GOAT_HUNT_CHANCES.default
 end
 
 local function FindEntityByPrefab(prefabs)
@@ -160,7 +176,12 @@ local function SpawnCelestialOrbCompensation()
 
     local x, y, z = FindMeteorTilePoint()
     if x == nil then
-        return
+        local anchor = FindSpawnAnchor()
+        if anchor == nil or anchor.Transform == nil then
+            return
+        end
+
+        x, y, z = FindSpawnPointNear(anchor, 5, 9)
     end
 
     local ent = _G.SpawnPrefab("rock_moon_shell")
@@ -169,35 +190,6 @@ local function SpawnCelestialOrbCompensation()
         ent.Transform:SetPosition(x, y, z)
         state.celestial_orb_spawned = true
     end
-end
-
-local function LunarRiftIsActive()
-    local world = _G.TheWorld
-    local riftspawner = world ~= nil and world.components.riftspawner or nil
-
-    if riftspawner ~= nil then
-        if riftspawner.IsLunarPortalActive ~= nil and riftspawner:IsLunarPortalActive() then
-            return true
-        end
-        if riftspawner.IsLunarRiftActive ~= nil and riftspawner:IsLunarRiftActive() then
-            return true
-        end
-    end
-
-    return FindEntityByPrefab({ lunarrift_portal = true }) ~= nil
-end
-
-local function MutatedWargIsDefeated()
-    local world = _G.TheWorld
-    local manager = world ~= nil and world.components.lunarriftmutationsmanager or nil
-    return manager ~= nil
-        and manager.HasDefeatedThisMutation ~= nil
-        and manager:HasDefeatedThisMutation("mutatedwarg")
-end
-
-local function HasExistingLunarWargFixEntity()
-    local entities = _G.TheSim:FindEntities(0, 0, 0, WORLD_SCAN_RADIUS, { "resource_null_lunar_warg_fix" }, { "INLIMBO" })
-    return #entities > 0
 end
 
 local function ShouldSpawnLunarWargClue()
@@ -210,57 +202,75 @@ local function ShouldSpawnLunarWargClue()
         return false
     end
 
-    return LunarRiftIsActive()
-        and not MutatedWargIsDefeated()
-        and not HasExistingLunarWargFixEntity()
+    return true
 end
 
-local function FindLunarRiftAnchor()
-    return FindEntityByPrefab({ lunarrift_portal = true })
+local function ForEachLunarRiftPortal(fn)
+    local entities = _G.TheSim:FindEntities(0, 0, 0, WORLD_SCAN_RADIUS, nil, { "INLIMBO" })
+    for _, ent in ipairs(entities) do
+        if ent.prefab == "lunarrift_portal" then
+            fn(ent)
+        end
+    end
+end
+
+local function RemoveLiveLunarWargForRift(rift_guid)
+    local entities = _G.TheSim:FindEntities(0, 0, 0, WORLD_SCAN_RADIUS, { "resource_null_lunar_warg_fix" }, { "INLIMBO" })
+    for _, ent in ipairs(entities) do
+        if ent.prefab == "mutatedwarg"
+            and ent.resource_null_lunar_rift_guid == rift_guid
+            and ent.components.health ~= nil
+            and not ent.components.health:IsDead() then
+            ent:Remove()
+        end
+    end
 end
 
 local function SpawnLunarWargClueNear(anchor)
     local state = GetWorldState()
-    if state == nil or not ShouldSpawnLunarWargClue() then
-        return
-    end
-
-    if anchor == nil or anchor.Transform == nil then
+    if anchor == nil
+        or anchor.Transform == nil
+        or anchor.resource_null_lunar_warg_clue_done
+        or state == nil
+        or state:IsLunarWargRiftDone(anchor.GUID)
+        or not ShouldSpawnLunarWargClue() then
         return
     end
 
     local x, y, z = FindSpawnPointNear(anchor, 10, 18)
     local clue = _G.SpawnPrefab("resource_null_lunar_warg_clue")
     if clue ~= nil then
+        anchor.resource_null_lunar_warg_clue_done = true
         clue.Transform:SetPosition(x, y, z)
         clue:FacePoint(anchor.Transform:GetWorldPosition())
         clue.resource_null_lunar_warg_spawn_x,
         clue.resource_null_lunar_warg_spawn_y,
         clue.resource_null_lunar_warg_spawn_z = anchor.Transform:GetWorldPosition()
+        clue.resource_null_lunar_rift_guid = anchor.GUID
+        anchor.resource_null_lunar_warg_clue = clue
+        state:MarkLunarWargRift(anchor.GUID, "spawned")
+
+        anchor:ListenForEvent("onremove", function()
+            if clue:IsValid() then
+                clue:Remove()
+            end
+            RemoveLiveLunarWargForRift(anchor.GUID)
+            state:ClearLunarWargRift(anchor.GUID)
+        end)
+
+        clue:ListenForEvent("onremove", function()
+            if anchor:IsValid() and anchor.resource_null_lunar_warg_clue == clue then
+                anchor.resource_null_lunar_warg_clue = nil
+            end
+        end)
+
         state.lunar_warg_clue_spawned_count = (state.lunar_warg_clue_spawned_count or 0) + 1
     end
 end
 
 local function SpawnLunarWargClue()
-    SpawnLunarWargClueNear(FindLunarRiftAnchor())
+    ForEachLunarRiftPortal(SpawnLunarWargClueNear)
 end
-
-local function DisableWargSummonsIfNeeded(inst)
-    if inst:HasTag("resource_null_lunar_warg_fix")
-        and GetModConfigData("lunar_warg_disable_summons") then
-        inst.NumHoundsToSpawn = function()
-            return 0
-        end
-    end
-end
-
-AddPrefabPostInit("mutatedwarg", function(inst)
-    if not IsMasterSim() then
-        return
-    end
-
-    inst:DoTaskInTime(0, DisableWargSummonsIfNeeded)
-end)
 
 AddPrefabPostInit("lunarrift_portal", function(inst)
     if not IsMasterSim() then
@@ -288,12 +298,11 @@ local function SpawnBeefaloAt(x, y, z)
 end
 
 local function TryBeefaloHuntSurprise(inst, data)
-    local mode = GetModConfigData("beefalo_hunt_surprise")
-    if mode == "off"
+    if not GetModConfigData("beefalo_hunt_surprise")
         or _G.TheWorld == nil
         or not _G.TheWorld.state.isspring
         or not _G.TheWorld.state.israining
-        or math.random() >= GetModConfigData("beefalo_hunt_chance") then
+        or math.random() >= GetLightningGoatHuntChance() then
         return
     end
 
@@ -302,17 +311,10 @@ local function TryBeefaloHuntSurprise(inst, data)
         return
     end
 
-    if mode == "replace" then
-        inst:Remove()
-        local beefalo = SpawnBeefaloAt(x, y, z)
-        if beefalo ~= nil then
-            beefalo:PushEvent("spawnedforhunt", data)
-        end
-    elseif mode == "add" then
-        local beefalo = SpawnBeefaloAt(x + 2, y, z + 2)
-        if beefalo ~= nil then
-            beefalo:PushEvent("spawnedforhunt", data)
-        end
+    inst:Remove()
+    local beefalo = SpawnBeefaloAt(x, y, z)
+    if beefalo ~= nil then
+        beefalo:PushEvent("spawnedforhunt", data)
     end
 end
 
