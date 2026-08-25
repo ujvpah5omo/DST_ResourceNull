@@ -49,8 +49,9 @@ local function IsNeverValue(value)
 end
 
 local function AnyOverrideIsNever(...)
-    for i = 1, select("#", ...) do
-        if IsNeverValue(GetOverride(select(i, ...))) then
+    local names = { ... }
+    for _, name in ipairs(names) do
+        if IsNeverValue(GetOverride(name)) then
             return true
         end
     end
