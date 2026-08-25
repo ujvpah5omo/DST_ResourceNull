@@ -10,6 +10,7 @@ _G.STRINGS.CHARACTERS.GENERIC.DESCRIBE.RESOURCE_NULL_LUNAR_WARG_CLUE = "这些�
 
 local WORLD_SCAN_RADIUS = 10000
 local METEOR_TILE_ATTEMPTS = 1500
+local CELESTIAL_ORB_METEOR_TIMEOUT = 120
 
 local LIGHTNING_GOAT_HUNT_CHANCES =
 {
@@ -67,11 +68,6 @@ local function MeteorsAreDisabled()
     local tuning = _G.TUNING
     return tuning.METEORSHOWER_BASEDELAY ~= nil
         and tuning.METEORSHOWER_BASEDELAY < 0
-end
-
-local function HuntsAreDisabled()
-    return AnyOverrideIsNever("hunt", "alternatehunt")
-        or _G.TUNING.HUNT_ENABLED == false
 end
 
 local function GetLightningGoatHuntChance()
@@ -159,51 +155,120 @@ local function FindMeteorTilePoint()
     end
 end
 
-local function ShouldCompensateCelestialOrb()
+local function CelestialOrbCompensationIsEnabled()
     local mode = GetModConfigData("celestial_orb_compensation")
-    if mode == "off" or IsCave() then
+    if mode == false or mode == "off" or IsCave() then
         return false
     end
 
-    return mode == "always_boulder"
-        or MeteorsAreDisabled()
+    return true
 end
 
-local function SpawnCelestialOrbCompensation()
-    local state = GetWorldState()
-    if state == nil or state.celestial_orb_spawned or not ShouldCompensateCelestialOrb() then
-        return
+local function ShouldCompensateCelestialOrb()
+    if not CelestialOrbCompensationIsEnabled() then
+        return false
     end
 
+    return MeteorsAreDisabled()
+end
+
+local function MarkCelestialOrbDone(state)
+    state.celestial_orb_spawned = true
+    state.celestial_orb_pending = false
+    if _G.TheWorld.components.worldmeteorshower ~= nil then
+        _G.TheWorld.components.worldmeteorshower.moonrockshell_chance = 1
+    end
+end
+
+local function HasCelestialOrbEntry()
+    return FindEntityByPrefab({
+        moonrockseed = true,
+        rock_moon_shell = true,
+    }) ~= nil
+end
+
+local function TrySpawnOriginalRockMoonShellMeteor()
+    local entities = _G.TheSim:FindEntities(0, 0, 0, WORLD_SCAN_RADIUS, nil, { "INLIMBO" })
+    for _, ent in ipairs(entities) do
+        if ent.prefab == "meteorspawner"
+            and ent.components.meteorshower ~= nil
+            and ent.components.meteorshower.SpawnMeteor ~= nil then
+            ent.components.meteorshower.should_have_rock_moon_shell = true
+            if ent.components.meteorshower:SpawnMeteor() ~= nil then
+                return true
+            end
+        end
+    end
+end
+
+local function SpawnFallbackRockMoonShellMeteor()
     local x, y, z = FindMeteorTilePoint()
     if x == nil then
         local anchor = FindSpawnAnchor()
         if anchor == nil or anchor.Transform == nil then
-            return
+            return false
         end
 
         x, y, z = FindSpawnPointNear(anchor, 5, 9)
     end
 
-    local ent = _G.SpawnPrefab("rock_moon_shell")
+    local meteor = _G.SpawnPrefab("shadowmeteor")
+    if meteor == nil then
+        return false
+    end
 
-    if ent ~= nil then
-        ent.Transform:SetPosition(x, y, z)
-        state.celestial_orb_spawned = true
+    meteor.Transform:SetPosition(x, y, z)
+    meteor:SetSize("rockmoonshell", 1)
+    if meteor.SetPeripheral ~= nil then
+        meteor:SetPeripheral(false)
+    end
+
+    return true
+end
+
+local function StartCelestialOrbPending(state)
+    state.celestial_orb_pending = true
+    _G.TheWorld:DoTaskInTime(CELESTIAL_ORB_METEOR_TIMEOUT, function()
+        local current_state = GetWorldState()
+        if current_state ~= nil
+            and current_state.celestial_orb_pending
+            and not HasCelestialOrbEntry() then
+            current_state.celestial_orb_pending = false
+        end
+    end)
+end
+
+local function SpawnCelestialOrbCompensation()
+    local state = GetWorldState()
+    if state == nil or not ShouldCompensateCelestialOrb() then
+        return
+    end
+
+    if state.celestial_orb_spawned or HasCelestialOrbEntry() then
+        MarkCelestialOrbDone(state)
+        return
+    end
+
+    if state.celestial_orb_pending then
+        return
+    end
+
+    if TrySpawnOriginalRockMoonShellMeteor()
+        or SpawnFallbackRockMoonShellMeteor() then
+        StartCelestialOrbPending(state)
+    end
+end
+
+local function OnCelestialOrbEntryExists()
+    local state = GetWorldState()
+    if state ~= nil and CelestialOrbCompensationIsEnabled() then
+        MarkCelestialOrbDone(state)
     end
 end
 
 local function ShouldSpawnLunarWargClue()
     local mode = GetModConfigData("lunar_warg_compensation")
-    if mode == "off" or IsCave() then
-        return false
-    end
-
-    if mode == "auto_clue" and not HuntsAreDisabled() then
-        return false
-    end
-
-    return true
+    return mode ~= false and mode ~= "off" and not IsCave()
 end
 
 local function ForEachLunarRiftPortal(fn)
@@ -282,6 +347,16 @@ AddPrefabPostInit("lunarrift_portal", function(inst)
         SpawnLunarWargClueNear(inst)
     end)
 end)
+
+for _, prefab in ipairs({ "moonrockseed", "rock_moon_shell" }) do
+    AddPrefabPostInit(prefab, function(inst)
+        if not IsMasterSim() then
+            return
+        end
+
+        inst:DoTaskInTime(0, OnCelestialOrbEntryExists)
+    end)
+end
 
 local function IsSavannaPoint(x, y, z)
     return _G.TheWorld ~= nil

@@ -1,6 +1,7 @@
 local ResourceNullWorldState = Class(function(self, inst)
     self.inst = inst
     self.celestial_orb_spawned = false
+    self.celestial_orb_pending = false
     self.lunar_warg_clue_spawned_count = 0
     self.lunar_warg_clue_used_count = 0
     self.lunar_warg_rifts = {}
