@@ -10,7 +10,19 @@ _G.STRINGS.CHARACTERS.GENERIC.DESCRIBE.RESOURCE_NULL_LUNAR_WARG_CLUE = "这些�
 
 local WORLD_SCAN_RADIUS = 10000
 local METEOR_TILE_ATTEMPTS = 1500
+local METEOR_SPAWNER_POINT_ATTEMPTS = 80
+local METEOR_SPAWNER_SEARCH_RADIUS = 48
 local CELESTIAL_ORB_METEOR_TIMEOUT = 120
+
+local LUNAR_ISLAND_NODE_TAGS =
+{
+    "lunacy",
+    "lunacyarea",
+    "lunarisland",
+    "moonisland",
+    "moon_island",
+    "not_mainland",
+}
 
 local LIGHTNING_GOAT_HUNT_CHANCES =
 {
@@ -115,6 +127,73 @@ local function IsMeteorTile(tile)
         and tile == _G.WORLD_TILES.METEOR
 end
 
+local function NodeHasTag(node, tag)
+    local tags = node ~= nil and node.tags or nil
+    if type(tags) ~= "table" then
+        return false
+    end
+
+    for _, node_tag in ipairs(tags) do
+        if type(node_tag) == "string" and string.lower(node_tag) == tag then
+            return true
+        end
+    end
+
+    for node_tag, value in pairs(tags) do
+        if value and type(node_tag) == "string" and string.lower(node_tag) == tag then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function PointHasVisualNodeTag(map, x, y, z, tag)
+    if map == nil or map.FindVisualNodeAtPoint == nil then
+        return false
+    end
+
+    local ok, node = pcall(map.FindVisualNodeAtPoint, map, x, y, z, tag)
+    return ok and node ~= nil
+end
+
+local function PointHasTopologyNodeTag(map, x, y, z, tag)
+    if map == nil or map.FindNodeAtPoint == nil then
+        return false
+    end
+
+    local ok, node_index = pcall(map.FindNodeAtPoint, map, x, y, z)
+    if not ok or node_index == nil then
+        return false
+    end
+
+    local node = type(node_index) == "table"
+        and node_index
+        or (_G.TheWorld ~= nil
+            and _G.TheWorld.topology ~= nil
+            and _G.TheWorld.topology.nodes ~= nil
+            and _G.TheWorld.topology.nodes[node_index]
+            or nil)
+
+    return NodeHasTag(node, tag)
+end
+
+local function IsLunarIslandPoint(x, y, z)
+    local map = _G.TheWorld ~= nil and _G.TheWorld.Map or nil
+    if map == nil then
+        return false
+    end
+
+    for _, tag in ipairs(LUNAR_ISLAND_NODE_TAGS) do
+        if PointHasVisualNodeTag(map, x, y, z, tag)
+            or PointHasTopologyNodeTag(map, x, y, z, tag) then
+            return true
+        end
+    end
+
+    return false
+end
+
 local function IsWalkablePoint(x, y, z)
     local map = _G.TheWorld ~= nil and _G.TheWorld.Map or nil
     if map == nil then
@@ -128,10 +207,53 @@ local function IsWalkablePoint(x, y, z)
     return not map:IsOceanAtPoint(x, y, z)
 end
 
+local function IsMainlandMeteorPoint(map, x, y, z)
+    return IsMeteorTile(map:GetTileAtPoint(x, y, z))
+        and IsWalkablePoint(x, y, z)
+        and not IsLunarIslandPoint(x, y, z)
+end
+
+local function FindMeteorPointNearSpawner(spawner, map)
+    if spawner == nil or spawner.Transform == nil or map == nil then
+        return nil
+    end
+
+    local spawner_x, spawner_y, spawner_z = spawner.Transform:GetWorldPosition()
+    if IsLunarIslandPoint(spawner_x, spawner_y, spawner_z) then
+        return nil
+    end
+
+    if IsMainlandMeteorPoint(map, spawner_x, spawner_y, spawner_z) then
+        return spawner_x, spawner_y, spawner_z
+    end
+
+    for _ = 1, METEOR_SPAWNER_POINT_ATTEMPTS do
+        local radius = math.random() * METEOR_SPAWNER_SEARCH_RADIUS
+        local angle = math.random() * _G.TWOPI
+        local offset = _G.FindWalkableOffset(_G.Vector3(spawner_x, spawner_y, spawner_z), angle, radius, 24, true, false)
+        local x = offset ~= nil and spawner_x + offset.x or spawner_x + math.cos(angle) * radius
+        local z = offset ~= nil and spawner_z + offset.z or spawner_z + math.sin(angle) * radius
+
+        if IsMainlandMeteorPoint(map, x, 0, z) then
+            return x, 0, z
+        end
+    end
+end
+
 local function FindMeteorTilePoint()
     local map = _G.TheWorld ~= nil and _G.TheWorld.Map or nil
     if map == nil or map.GetSize == nil then
         return nil
+    end
+
+    local entities = _G.TheSim:FindEntities(0, 0, 0, WORLD_SCAN_RADIUS, nil, { "INLIMBO" })
+    for _, ent in ipairs(entities) do
+        if ent.prefab == "meteorspawner" then
+            local x, y, z = FindMeteorPointNearSpawner(ent, map)
+            if x ~= nil then
+                return x, y, z
+            end
+        end
     end
 
     local width, height = map:GetSize()
@@ -141,16 +263,8 @@ local function FindMeteorTilePoint()
         local x = (math.random() * width - width * 0.5) * scale
         local z = (math.random() * height - height * 0.5) * scale
 
-        if IsMeteorTile(map:GetTileAtPoint(x, 0, z)) and IsWalkablePoint(x, 0, z) then
+        if IsMainlandMeteorPoint(map, x, 0, z) then
             return x, 0, z
-        end
-    end
-
-    local spawner = FindEntityByPrefab({ meteorspawner = true })
-    if spawner ~= nil and spawner.Transform ~= nil then
-        local x, y, z = FindSpawnPointNear(spawner, 4, 12)
-        if IsMeteorTile(map:GetTileAtPoint(x, y, z)) then
-            return x, y, z
         end
     end
 end
@@ -188,11 +302,13 @@ local function HasCelestialOrbEntry()
 end
 
 local function TrySpawnOriginalRockMoonShellMeteor()
+    local map = _G.TheWorld ~= nil and _G.TheWorld.Map or nil
     local entities = _G.TheSim:FindEntities(0, 0, 0, WORLD_SCAN_RADIUS, nil, { "INLIMBO" })
     for _, ent in ipairs(entities) do
         if ent.prefab == "meteorspawner"
             and ent.components.meteorshower ~= nil
-            and ent.components.meteorshower.SpawnMeteor ~= nil then
+            and ent.components.meteorshower.SpawnMeteor ~= nil
+            and FindMeteorPointNearSpawner(ent, map) ~= nil then
             ent.components.meteorshower.should_have_rock_moon_shell = true
             if ent.components.meteorshower:SpawnMeteor() ~= nil then
                 return true
