@@ -21,7 +21,6 @@ local LUNAR_ISLAND_NODE_TAGS =
     "lunarisland",
     "moonisland",
     "moon_island",
-    "not_mainland",
 }
 
 local LIGHTNING_GOAT_HUNT_CHANCES =
@@ -212,6 +211,11 @@ local function IsMainlandMeteorPoint(map, x, y, z)
         and not IsLunarIslandPoint(x, y, z)
 end
 
+local function IsNonLunarWalkablePoint(x, y, z)
+    return IsWalkablePoint(x, y, z)
+        and not IsLunarIslandPoint(x, y, z)
+end
+
 local function FindMeteorPointNearSpawner(spawner, map)
     if spawner == nil or spawner.Transform == nil or map == nil then
         return nil
@@ -234,6 +238,18 @@ local function FindMeteorPointNearSpawner(spawner, map)
         local z = offset ~= nil and spawner_z + offset.z or spawner_z + math.sin(angle) * radius
 
         if IsMainlandMeteorPoint(map, x, 0, z) then
+            return x, 0, z
+        end
+    end
+
+    for _ = 1, METEOR_SPAWNER_POINT_ATTEMPTS do
+        local radius = 4 + math.random() * 12
+        local angle = math.random() * _G.TWOPI
+        local offset = _G.FindWalkableOffset(_G.Vector3(spawner_x, spawner_y, spawner_z), angle, radius, 24, true, false)
+        local x = offset ~= nil and spawner_x + offset.x or spawner_x + math.cos(angle) * radius
+        local z = offset ~= nil and spawner_z + offset.z or spawner_z + math.sin(angle) * radius
+
+        if IsNonLunarWalkablePoint(x, 0, z) then
             return x, 0, z
         end
     end

@@ -1,6 +1,6 @@
 name = "无资源修正"
 author = "codex"
-version = "0.1.4"
+version = "0.1.5"
 forumthread = ""
 api_version = 10
 dst_compatible = true
@@ -18,7 +18,7 @@ configuration_options =
         hover = "开启后，关闭陨石且世界没有天体宝球入口时，补一个大陆陨石区的可疑月岩矿。",
         options =
         {
-            { description = "开启", data = true, hover = "关闭陨石且没有天体宝球入口时，优先在大陆陨石地形补可疑月岩矿；找不到则在出生门附近生成。" },
+            { description = "开启", data = true, hover = "关闭陨石且没有天体宝球入口时，优先在大陆陨石区或陨石生成器附近补可疑月岩矿；找不到则在出生门附近生成。" },
             { description = "关闭", data = false, hover = "不进行补偿。" },
         },
         default = true,
