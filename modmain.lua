@@ -153,8 +153,7 @@ local function PointHasVisualNodeTag(map, x, y, z, tag)
         return false
     end
 
-    local ok, node = pcall(map.FindVisualNodeAtPoint, map, x, y, z, tag)
-    return ok and node ~= nil
+    return map:FindVisualNodeAtPoint(x, y, z, tag) ~= nil
 end
 
 local function PointHasTopologyNodeTag(map, x, y, z, tag)
@@ -162,8 +161,8 @@ local function PointHasTopologyNodeTag(map, x, y, z, tag)
         return false
     end
 
-    local ok, node_index = pcall(map.FindNodeAtPoint, map, x, y, z)
-    if not ok or node_index == nil then
+    local node_index = map:FindNodeAtPoint(x, y, z)
+    if node_index == nil then
         return false
     end
 
