@@ -9,7 +9,6 @@ _G.STRINGS.NAMES.RESOURCE_NULL_LUNAR_WARG_CLUE = "月化踪迹"
 _G.STRINGS.CHARACTERS.GENERIC.DESCRIBE.RESOURCE_NULL_LUNAR_WARG_CLUE = "这些痕迹不该出现在这里。"
 
 local WORLD_SCAN_RADIUS = 10000
-local METEOR_TILE_ATTEMPTS = 1500
 local METEOR_SPAWNER_POINT_ATTEMPTS = 80
 local METEOR_SPAWNER_SEARCH_RADIUS = 48
 local CELESTIAL_ORB_METEOR_TIMEOUT = 120
@@ -118,6 +117,18 @@ local function FindSpawnPointNear(anchor, min_radius, max_radius)
     end
 
     return x, y, z
+end
+
+local function GetDistanceSqToSpawnAnchor(x, z)
+    local anchor = FindSpawnAnchor()
+    if anchor == nil or anchor.Transform == nil then
+        return 0
+    end
+
+    local anchor_x, _, anchor_z = anchor.Transform:GetWorldPosition()
+    local dx = x - anchor_x
+    local dz = z - anchor_z
+    return dx * dx + dz * dz
 end
 
 local function IsMeteorTile(tile)
@@ -255,30 +266,33 @@ local function FindMeteorPointNearSpawner(spawner, map)
     end
 end
 
-local function FindMeteorTilePoint()
+local function FindMeteorSpawnerPoint()
     local map = _G.TheWorld ~= nil and _G.TheWorld.Map or nil
-    if map == nil or map.GetSize == nil then
+    if map == nil then
         return nil
     end
 
+    local candidates = {}
     local entities = _G.TheSim:FindEntities(0, 0, 0, WORLD_SCAN_RADIUS, nil, { "INLIMBO" })
     for _, ent in ipairs(entities) do
         if ent.prefab == "meteorspawner" then
-            local x, y, z = FindMeteorPointNearSpawner(ent, map)
-            if x ~= nil then
-                return x, y, z
+            local spawner_x, _, spawner_z = ent.Transform:GetWorldPosition()
+            if not IsLunarIslandPoint(spawner_x, 0, spawner_z) then
+                table.insert(candidates, {
+                    spawner = ent,
+                    distance_sq = GetDistanceSqToSpawnAnchor(spawner_x, spawner_z),
+                })
             end
         end
     end
 
-    local width, height = map:GetSize()
-    local scale = _G.TILE_SCALE or 4
+    table.sort(candidates, function(a, b)
+        return a.distance_sq < b.distance_sq
+    end)
 
-    for _ = 1, METEOR_TILE_ATTEMPTS do
-        local x = (math.random() * width - width * 0.5) * scale
-        local z = (math.random() * height - height * 0.5) * scale
-
-        if IsMainlandMeteorPoint(map, x, 0, z) then
+    for _, candidate in ipairs(candidates) do
+        local x, y, z = FindMeteorPointNearSpawner(candidate.spawner, map)
+        if x ~= nil then
             return x, 0, z
         end
     end
@@ -317,7 +331,7 @@ local function HasCelestialOrbEntry()
 end
 
 local function SpawnFallbackRockMoonShell()
-    local x, y, z = FindMeteorTilePoint()
+    local x, y, z = FindMeteorSpawnerPoint()
     if x == nil then
         local anchor = FindSpawnAnchor()
         if anchor == nil or anchor.Transform == nil then
