@@ -233,9 +233,6 @@ local function FindMeteorPointNearSpawner(spawner, map)
     end
 
     local spawner_x, spawner_y, spawner_z = spawner.Transform:GetWorldPosition()
-    if IsLunarIslandPoint(spawner_x, spawner_y, spawner_z) then
-        return nil
-    end
 
     if IsMainlandMeteorPoint(map, spawner_x, spawner_y, spawner_z) then
         return spawner_x, spawner_y, spawner_z
@@ -264,6 +261,8 @@ local function FindMeteorPointNearSpawner(spawner, map)
             return x, 0, z
         end
     end
+
+    return spawner_x, spawner_y, spawner_z
 end
 
 local function FindMeteorSpawnerPoint()
@@ -277,16 +276,19 @@ local function FindMeteorSpawnerPoint()
     for _, ent in ipairs(entities) do
         if ent.prefab == "meteorspawner" then
             local spawner_x, _, spawner_z = ent.Transform:GetWorldPosition()
-            if not IsLunarIslandPoint(spawner_x, 0, spawner_z) then
-                table.insert(candidates, {
-                    spawner = ent,
-                    distance_sq = GetDistanceSqToSpawnAnchor(spawner_x, spawner_z),
-                })
-            end
+            table.insert(candidates, {
+                spawner = ent,
+                distance_sq = GetDistanceSqToSpawnAnchor(spawner_x, spawner_z),
+                lunar = IsLunarIslandPoint(spawner_x, 0, spawner_z),
+            })
         end
     end
 
     table.sort(candidates, function(a, b)
+        if a.lunar ~= b.lunar then
+            return not a.lunar
+        end
+
         return a.distance_sq < b.distance_sq
     end)
 
