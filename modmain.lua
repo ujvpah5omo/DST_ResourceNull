@@ -11,6 +11,7 @@ _G.STRINGS.CHARACTERS.GENERIC.DESCRIBE.RESOURCE_NULL_LUNAR_WARG_CLUE = "这些�
 local WORLD_SCAN_RADIUS = 10000
 local METEOR_SPAWNER_POINT_ATTEMPTS = 80
 local METEOR_SPAWNER_SEARCH_RADIUS = 48
+local SPAWN_FALLBACK_RELOCATE_DISTANCE_SQ = 20 * 20
 local CELESTIAL_ORB_METEOR_TIMEOUT = 120
 
 local LUNAR_ISLAND_NODE_TAGS =
@@ -131,6 +132,49 @@ local function GetDistanceSqToSpawnAnchor(x, z)
     return dx * dx + dz * dz
 end
 
+local function RememberMeteorSpawnerPoint(x, y, z)
+    local world = _G.TheWorld
+    if world == nil or x == nil or z == nil then
+        return
+    end
+
+    if math.abs(x) < 1 and math.abs(z) < 1 then
+        return
+    end
+
+    local points = world.resource_null_meteorspawner_points
+    if points == nil then
+        points = {}
+        world.resource_null_meteorspawner_points = points
+    end
+
+    for _, point in ipairs(points) do
+        local dx = point.x - x
+        local dz = point.z - z
+        if dx * dx + dz * dz < 4 then
+            return
+        end
+    end
+
+    table.insert(points, { x = x, y = y or 0, z = z })
+end
+
+local function RememberMeteorSpawner(inst)
+    if inst == nil or inst.Transform == nil then
+        return
+    end
+
+    local function remember()
+        if inst.Transform ~= nil then
+            RememberMeteorSpawnerPoint(inst.Transform:GetWorldPosition())
+        end
+    end
+
+    remember()
+    inst:DoTaskInTime(0, remember)
+    inst:ListenForEvent("onremove", remember)
+end
+
 local function IsMeteorTile(tile)
     return _G.WORLD_TILES ~= nil
         and _G.WORLD_TILES.METEOR ~= nil
@@ -227,12 +271,12 @@ local function IsNonLunarWalkablePoint(x, y, z)
         and not IsLunarIslandPoint(x, y, z)
 end
 
-local function FindMeteorPointNearSpawner(spawner, map)
-    if spawner == nil or spawner.Transform == nil or map == nil then
+local function FindMeteorPointNearPosition(spawner_x, spawner_y, spawner_z, map)
+    if spawner_x == nil or spawner_z == nil or map == nil then
         return nil
     end
 
-    local spawner_x, spawner_y, spawner_z = spawner.Transform:GetWorldPosition()
+    spawner_y = spawner_y or 0
 
     if IsMainlandMeteorPoint(map, spawner_x, spawner_y, spawner_z) then
         return spawner_x, spawner_y, spawner_z
@@ -265,6 +309,15 @@ local function FindMeteorPointNearSpawner(spawner, map)
     return spawner_x, spawner_y, spawner_z
 end
 
+local function FindMeteorPointNearSpawner(spawner, map)
+    if spawner == nil or spawner.Transform == nil then
+        return nil
+    end
+
+    local spawner_x, spawner_y, spawner_z = spawner.Transform:GetWorldPosition()
+    return FindMeteorPointNearPosition(spawner_x, spawner_y, spawner_z, map)
+end
+
 local function FindMeteorSpawnerPoint()
     local map = _G.TheWorld ~= nil and _G.TheWorld.Map or nil
     if map == nil then
@@ -276,10 +329,27 @@ local function FindMeteorSpawnerPoint()
     for _, ent in ipairs(entities) do
         if ent.prefab == "meteorspawner" then
             local spawner_x, _, spawner_z = ent.Transform:GetWorldPosition()
+            RememberMeteorSpawnerPoint(ent.Transform:GetWorldPosition())
             table.insert(candidates, {
                 spawner = ent,
+                x = spawner_x,
+                y = 0,
+                z = spawner_z,
                 distance_sq = GetDistanceSqToSpawnAnchor(spawner_x, spawner_z),
                 lunar = IsLunarIslandPoint(spawner_x, 0, spawner_z),
+            })
+        end
+    end
+
+    local remembered_points = _G.TheWorld ~= nil and _G.TheWorld.resource_null_meteorspawner_points or nil
+    if remembered_points ~= nil then
+        for _, point in ipairs(remembered_points) do
+            table.insert(candidates, {
+                x = point.x,
+                y = point.y or 0,
+                z = point.z,
+                distance_sq = GetDistanceSqToSpawnAnchor(point.x, point.z),
+                lunar = IsLunarIslandPoint(point.x, point.y or 0, point.z),
             })
         end
     end
@@ -293,7 +363,9 @@ local function FindMeteorSpawnerPoint()
     end)
 
     for _, candidate in ipairs(candidates) do
-        local x, y, z = FindMeteorPointNearSpawner(candidate.spawner, map)
+        local x, y, z = candidate.spawner ~= nil
+            and FindMeteorPointNearSpawner(candidate.spawner, map)
+            or FindMeteorPointNearPosition(candidate.x, candidate.y, candidate.z, map)
         if x ~= nil then
             return x, 0, z
         end
@@ -325,11 +397,40 @@ local function MarkCelestialOrbDone(state)
     end
 end
 
-local function HasCelestialOrbEntry()
-    return FindEntityByPrefab({
+local function FindCelestialOrbEntry(prefabs)
+    return FindEntityByPrefab(prefabs or {
         moonrockseed = true,
         rock_moon_shell = true,
-    }) ~= nil
+    })
+end
+
+local function HasCelestialOrbEntry()
+    return FindCelestialOrbEntry() ~= nil
+end
+
+local function GetDistanceSqToSpawnAnchorForEntity(ent)
+    if ent == nil or ent.Transform == nil then
+        return nil
+    end
+
+    local x, _, z = ent.Transform:GetWorldPosition()
+    return GetDistanceSqToSpawnAnchor(x, z)
+end
+
+local function RelocateSpawnFallbackRockMoonShell()
+    local shell = FindCelestialOrbEntry({ rock_moon_shell = true })
+    local shell_distance_sq = GetDistanceSqToSpawnAnchorForEntity(shell)
+    if shell_distance_sq == nil or shell_distance_sq > SPAWN_FALLBACK_RELOCATE_DISTANCE_SQ then
+        return false
+    end
+
+    local x, y, z = FindMeteorSpawnerPoint()
+    if x == nil or GetDistanceSqToSpawnAnchor(x, z) <= SPAWN_FALLBACK_RELOCATE_DISTANCE_SQ then
+        return false
+    end
+
+    shell.Transform:SetPosition(x, y or 0, z)
+    return true
 end
 
 local function SpawnFallbackRockMoonShell()
@@ -370,6 +471,8 @@ local function SpawnCelestialOrbCompensation()
     if state == nil or not ShouldCompensateCelestialOrb() then
         return
     end
+
+    RelocateSpawnFallbackRockMoonShell()
 
     if state.celestial_orb_spawned or HasCelestialOrbEntry() then
         MarkCelestialOrbDone(state)
@@ -483,6 +586,12 @@ for _, prefab in ipairs({ "moonrockseed", "rock_moon_shell" }) do
         inst:DoTaskInTime(0, OnCelestialOrbEntryExists)
     end)
 end
+
+AddPrefabPostInit("meteorspawner", function(inst)
+    if IsMasterSim() then
+        RememberMeteorSpawner(inst)
+    end
+end)
 
 local function IsSavannaPoint(x, y, z)
     return _G.TheWorld ~= nil
