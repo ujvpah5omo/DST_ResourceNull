@@ -316,22 +316,6 @@ local function HasCelestialOrbEntry()
     }) ~= nil
 end
 
-local function TrySpawnOriginalRockMoonShellMeteor()
-    local map = _G.TheWorld ~= nil and _G.TheWorld.Map or nil
-    local entities = _G.TheSim:FindEntities(0, 0, 0, WORLD_SCAN_RADIUS, nil, { "INLIMBO" })
-    for _, ent in ipairs(entities) do
-        if ent.prefab == "meteorspawner"
-            and ent.components.meteorshower ~= nil
-            and ent.components.meteorshower.SpawnMeteor ~= nil
-            and FindMeteorPointNearSpawner(ent, map) ~= nil then
-            ent.components.meteorshower.should_have_rock_moon_shell = true
-            if ent.components.meteorshower:SpawnMeteor() ~= nil then
-                return true
-            end
-        end
-    end
-end
-
 local function SpawnFallbackRockMoonShellMeteor()
     local x, y, z = FindMeteorTilePoint()
     if x == nil then
@@ -384,8 +368,7 @@ local function SpawnCelestialOrbCompensation()
         return
     end
 
-    if TrySpawnOriginalRockMoonShellMeteor()
-        or SpawnFallbackRockMoonShellMeteor() then
+    if SpawnFallbackRockMoonShellMeteor() then
         StartCelestialOrbPending(state)
     end
 end
