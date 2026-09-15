@@ -316,7 +316,7 @@ local function HasCelestialOrbEntry()
     }) ~= nil
 end
 
-local function SpawnFallbackRockMoonShellMeteor()
+local function SpawnFallbackRockMoonShell()
     local x, y, z = FindMeteorTilePoint()
     if x == nil then
         local anchor = FindSpawnAnchor()
@@ -327,16 +327,12 @@ local function SpawnFallbackRockMoonShellMeteor()
         x, y, z = FindSpawnPointNear(anchor, 5, 9)
     end
 
-    local meteor = _G.SpawnPrefab("shadowmeteor")
-    if meteor == nil then
+    local shell = _G.SpawnPrefab("rock_moon_shell")
+    if shell == nil then
         return false
     end
 
-    meteor.Transform:SetPosition(x, y, z)
-    meteor:SetSize("rockmoonshell", 1)
-    if meteor.SetPeripheral ~= nil then
-        meteor:SetPeripheral(false)
-    end
+    shell.Transform:SetPosition(x, y, z)
 
     return true
 end
@@ -368,7 +364,7 @@ local function SpawnCelestialOrbCompensation()
         return
     end
 
-    if SpawnFallbackRockMoonShellMeteor() then
+    if SpawnFallbackRockMoonShell() then
         StartCelestialOrbPending(state)
     end
 end
