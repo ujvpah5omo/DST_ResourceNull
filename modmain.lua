@@ -363,9 +363,13 @@ local function FindMeteorSpawnerPoint()
     end)
 
     for _, candidate in ipairs(candidates) do
-        local x, y, z = candidate.spawner ~= nil
-            and FindMeteorPointNearSpawner(candidate.spawner, map)
-            or FindMeteorPointNearPosition(candidate.x, candidate.y, candidate.z, map)
+        local x, y, z
+        if candidate.spawner ~= nil then
+            x, y, z = FindMeteorPointNearSpawner(candidate.spawner, map)
+        else
+            x, y, z = FindMeteorPointNearPosition(candidate.x, candidate.y, candidate.z, map)
+        end
+
         if x ~= nil then
             return x, 0, z
         end
