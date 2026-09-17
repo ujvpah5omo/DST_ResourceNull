@@ -8,13 +8,13 @@ local RESOURCE_SETPIECE_CONFIGS =
     leif_forest = "setpiece_leif_forest",
     spider_forest = "setpiece_spider_forest",
     pigguard_berries = "setpiece_pigguard_berries",
-    pigguard_berries_easy = "setpiece_pigguard_berries",
-    wasphive_grass_easy = "setpiece_wasphive_grass",
+    pigguard_berries_easy = "setpiece_pigguard_berries_easy",
+    wasphive_grass_easy = "setpiece_wasphive_grass_easy",
     hound_rocks = "setpiece_hound_rocks",
     tenticle_reeds = "setpiece_tenticle_reeds",
     tallbird_rocks = "setpiece_tallbird_rocks",
     pigguard_grass = "setpiece_pigguard_grass",
-    pigguard_grass_easy = "setpiece_pigguard_grass",
+    pigguard_grass_easy = "setpiece_pigguard_grass_easy",
 
     ["Dev Graveyard"] = "setpiece_dev_graveyard",
     ["Sleeping Spider"] = "setpiece_sleeping_spider",
@@ -22,38 +22,13 @@ local RESOURCE_SETPIECE_CONFIGS =
     ["Rotted Base"] = "setpiece_rotted_base",
     ["Beefalo Farm"] = "setpiece_beefalo_farm",
 
-    skeleton_researchlab1 = "setpiece_researchlab_plants",
-    skeleton_researchlab2 = "setpiece_researchlab_plants",
-    skeleton_researchlab3 = "setpiece_researchlab_plants",
+    skeleton_researchlab1 = "setpiece_skeleton_researchlab1",
+    skeleton_researchlab2 = "setpiece_skeleton_researchlab2",
+    skeleton_researchlab3 = "setpiece_skeleton_researchlab3",
     skeleton_miner_dirt = "setpiece_skeleton_miner_dirt",
     skeleton_hunter_swamp = "setpiece_skeleton_hunter_swamp",
-    skeleton_wizard_ice = "setpiece_skeleton_wizard_trees",
-    skeleton_wizard_fire = "setpiece_skeleton_wizard_trees",
-
-}
-
-local RESOURCE_ROOM_STATIC_LAYOUTS =
-{
-    SpiderfieldEasyA = { config = "setpiece_spider_blockers", layouts = { SpiderBlockerEasy = true } },
-    SpiderfieldEasyB = { config = "setpiece_spider_blockers", layouts = { SpiderBlockerEasyB = true } },
-    SpiderfieldA = { config = "setpiece_spider_blockers", layouts = { SpiderBlocker = true } },
-    SpiderfieldB = { config = "setpiece_spider_blockers", layouts = { SpiderBlockerB = true } },
-    SpiderfieldC = { config = "setpiece_spider_blockers", layouts = { SpiderBlockerC = true } },
-
-    TallbirdfieldSmallA = { config = "setpiece_tallbird_blockers", layouts = { TallbirdBlockerSmall = true } },
-    TallbirdfieldA = { config = "setpiece_tallbird_blockers", layouts = { TallbirdBlocker = true } },
-    TallbirdfieldB = { config = "setpiece_tallbird_blockers", layouts = { TallbirdBlockerB = true } },
-
-    TentaclelandSmallA = { config = "setpiece_tentacle_blockers", layouts = { TentacleBlockerSmall = true } },
-    TentaclelandA = { config = "setpiece_tentacle_blockers", layouts = { TentacleBlocker = true } },
-}
-
-local RESOURCE_ROOM_PREFABS =
-{
-    SpiderfieldEasy = { config = "setpiece_spider_blockers", prefabs = { spiderden = true } },
-    Spiderfield = { config = "setpiece_spider_blockers", prefabs = { spiderden = true } },
-    Tallbirdfield = { config = "setpiece_tallbird_blockers", prefabs = { tallbirdnest = true } },
-    Tentacleland = { config = "setpiece_tentacle_blockers", prefabs = { tentacle = true, pond_mos = true, reeds = true, marsh_bush = true, marsh_tree = true } },
+    skeleton_wizard_ice = "setpiece_skeleton_wizard_ice",
+    skeleton_wizard_fire = "setpiece_skeleton_wizard_fire",
 }
 
 local function ShouldKeepSetPiece(name)
@@ -132,49 +107,6 @@ local function FilterTaskSetPieces(task)
     task.set_pieces = filtered
 end
 
-local function RemoveNamedKeys(tbl, names)
-    if type(tbl) ~= "table" then
-        return false
-    end
-
-    local changed = false
-    for name in pairs(names) do
-        if tbl[name] ~= nil then
-            tbl[name] = nil
-            changed = true
-        end
-    end
-
-    return changed
-end
-
-local function TableIsEmpty(tbl)
-    return type(tbl) ~= "table" or next(tbl) == nil
-end
-
-local function ApplyRoomStaticLayoutConfig(room, data)
-    if ConfigEnabled(data.config) or type(room.contents) ~= "table" then
-        return
-    end
-
-    RemoveNamedKeys(room.contents.countstaticlayouts, data.layouts)
-end
-
-local function ApplyRoomPrefabConfig(room, data)
-    if ConfigEnabled(data.config) or type(room.contents) ~= "table" then
-        return
-    end
-
-    local contents = room.contents
-    RemoveNamedKeys(contents.countprefabs, data.prefabs)
-    RemoveNamedKeys(contents.distributeprefabs, data.prefabs)
-    RemoveNamedKeys(contents.prefabdata, data.prefabs)
-
-    if TableIsEmpty(contents.distributeprefabs) then
-        contents.distributepercent = 0
-    end
-end
-
 local function ApplyLevelSetPieceConfig(level)
     RemoveDisabledNamedSetPieces(level.set_pieces)
     FilterRandomSetPieces(level)
@@ -184,20 +116,4 @@ AddLevelPreInitAny(ApplyLevelSetPieceConfig)
 
 if AddTaskPreInitAny ~= nil then
     AddTaskPreInitAny(FilterTaskSetPieces)
-end
-
-if AddRoomPreInit ~= nil then
-    for room_name, data in pairs(RESOURCE_ROOM_STATIC_LAYOUTS) do
-        local room_data = data
-        AddRoomPreInit(room_name, function(room)
-            ApplyRoomStaticLayoutConfig(room, room_data)
-        end)
-    end
-
-    for room_name, data in pairs(RESOURCE_ROOM_PREFABS) do
-        local room_data = data
-        AddRoomPreInit(room_name, function(room)
-            ApplyRoomPrefabConfig(room, room_data)
-        end)
-    end
 end

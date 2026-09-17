@@ -1,6 +1,6 @@
 name = "无资源修正"
 author = "codex"
-version = "0.1.14"
+version = "0.1.15"
 forumthread = ""
 api_version = 10
 dst_compatible = true
@@ -70,27 +70,49 @@ configuration_options =
     {
         name = "setpiece_pigguard_berries",
         label = "猪人守卫浆果奇遇",
-        hover = "控制猪人守卫浆果；包含普通版和简单版浆果丛布局。",
+        hover = "控制猪人守卫浆果布局；会生成浆果丛。",
         options =
         {
             { description = "开启", data = true, hover = "保留猪人守卫浆果布局。" },
-            { description = "关闭", data = false, hover = "移除这些布局，避免额外浆果丛。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免额外浆果丛。" },
+        },
+        default = true,
+    },
+    {
+        name = "setpiece_pigguard_berries_easy",
+        label = "简单猪人守卫浆果奇遇",
+        hover = "控制简单版猪人守卫浆果布局；会生成浆果丛。",
+        options =
+        {
+            { description = "开启", data = true, hover = "保留简单猪人守卫浆果布局。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免额外浆果丛。" },
         },
         default = true,
     },
     {
         name = "setpiece_pigguard_grass",
         label = "猪人守卫草奇遇",
-        hover = "控制猪人守卫草；包含普通版和简单版草丛布局。",
+        hover = "控制猪人守卫草丛布局；会生成草丛。",
         options =
         {
             { description = "开启", data = true, hover = "保留猪人守卫草布局。" },
-            { description = "关闭", data = false, hover = "移除这些布局，避免额外草丛。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免额外草丛。" },
         },
         default = true,
     },
     {
-        name = "setpiece_wasphive_grass",
+        name = "setpiece_pigguard_grass_easy",
+        label = "简单猪人守卫草奇遇",
+        hover = "控制简单版猪人守卫草丛布局；会生成草丛。",
+        options =
+        {
+            { description = "开启", data = true, hover = "保留简单猪人守卫草布局。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免额外草丛。" },
+        },
+        default = true,
+    },
+    {
+        name = "setpiece_wasphive_grass_easy",
         label = "蜂巢草地奇遇",
         hover = "控制杀人蜂巢守草布局；会生成草丛和杀人蜂巢。",
         options =
@@ -189,13 +211,35 @@ configuration_options =
         default = true,
     },
     {
-        name = "setpiece_researchlab_plants",
-        label = "科技站植物奇遇",
-        hover = "控制科技站废墟中的植物资源；包含树、树苗、浆果丛和蜂箱。",
+        name = "setpiece_skeleton_researchlab1",
+        label = "科技站废墟 1 奇遇",
+        hover = "控制科技站废墟 1；会生成树和农场建筑。",
         options =
         {
-            { description = "开启", data = true, hover = "保留科技站废墟植物。" },
-            { description = "关闭", data = false, hover = "移除相关科技站废墟，避免植物和蜂箱入口。" },
+            { description = "开启", data = true, hover = "保留科技站废墟 1。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免额外树木和农场建筑。" },
+        },
+        default = true,
+    },
+    {
+        name = "setpiece_skeleton_researchlab2",
+        label = "科技站废墟 2 奇遇",
+        hover = "控制科技站废墟 2；会生成树。",
+        options =
+        {
+            { description = "开启", data = true, hover = "保留科技站废墟 2。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免额外树木。" },
+        },
+        default = true,
+    },
+    {
+        name = "setpiece_skeleton_researchlab3",
+        label = "科技站废墟 3 奇遇",
+        hover = "控制科技站废墟 3；会生成浆果丛、树苗、蜂箱和树。",
+        options =
+        {
+            { description = "开启", data = true, hover = "保留科技站废墟 3。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免浆果丛、树苗、蜂箱和树木入口。" },
         },
         default = true,
     },
@@ -222,46 +266,24 @@ configuration_options =
         default = true,
     },
     {
-        name = "setpiece_skeleton_wizard_trees",
-        label = "法师骸骨树木奇遇",
-        hover = "控制冰/火法师骸骨中的树木布局。",
+        name = "setpiece_skeleton_wizard_ice",
+        label = "冰法师骸骨树木奇遇",
+        hover = "控制冰法师骸骨中的树木布局。",
         options =
         {
-            { description = "开启", data = true, hover = "保留法师骸骨树木。" },
-            { description = "关闭", data = false, hover = "移除相关法师骸骨，避免额外树木。" },
+            { description = "开启", data = true, hover = "保留冰法师骸骨树木。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免额外树木。" },
         },
         default = true,
     },
     {
-        name = "setpiece_spider_blockers",
-        label = "随机蜘蛛阻挡布局",
-        hover = "控制随机蜘蛛阻挡布局和蜘蛛场房间；这些内容会生成蜘蛛巢和树。",
+        name = "setpiece_skeleton_wizard_fire",
+        label = "火法师骸骨树木奇遇",
+        hover = "控制火法师骸骨中的树木布局。",
         options =
         {
-            { description = "开启", data = true, hover = "保留随机蜘蛛阻挡布局。" },
-            { description = "关闭", data = false, hover = "移除这些随机布局和蜘蛛场蜘蛛巢入口。" },
-        },
-        default = true,
-    },
-    {
-        name = "setpiece_tallbird_blockers",
-        label = "随机高脚鸟阻挡布局",
-        hover = "控制随机高脚鸟阻挡布局和高脚鸟场房间；这些内容会生成高脚鸟巢。",
-        options =
-        {
-            { description = "开启", data = true, hover = "保留随机高脚鸟阻挡布局。" },
-            { description = "关闭", data = false, hover = "移除这些随机布局和高脚鸟场高脚鸟巢入口。" },
-        },
-        default = true,
-    },
-    {
-        name = "setpiece_tentacle_blockers",
-        label = "随机触手阻挡布局",
-        hover = "控制随机触手阻挡布局和触手沼泽房间；这些内容会生成触手、池塘、芦苇和针刺树。",
-        options =
-        {
-            { description = "开启", data = true, hover = "保留随机触手阻挡布局。" },
-            { description = "关闭", data = false, hover = "移除这些随机布局和触手沼泽资源入口。" },
+            { description = "开启", data = true, hover = "保留火法师骸骨树木。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免额外树木。" },
         },
         default = true,
     },
