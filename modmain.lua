@@ -13,6 +13,8 @@ local METEOR_SPAWNER_POINT_ATTEMPTS = 80
 local METEOR_SPAWNER_SEARCH_RADIUS = 48
 local SPAWN_FALLBACK_RELOCATE_DISTANCE_SQ = 20 * 20
 local CELESTIAL_ORB_METEOR_TIMEOUT = 120
+local HUNT_SURPRISE_TERRAIN_SEARCH_RADIUS = 16
+local HUNT_SURPRISE_TERRAIN_SEARCH_STEP = 4
 
 local LUNAR_ISLAND_NODE_TAGS =
 {
@@ -21,16 +23,6 @@ local LUNAR_ISLAND_NODE_TAGS =
     "lunarisland",
     "moonisland",
     "moon_island",
-}
-
-local LIGHTNING_GOAT_HUNT_CHANCES =
-{
-    never = 0,
-    none = 0,
-    rare = 0.10,
-    default = 0.25,
-    often = 0.50,
-    always = 1,
 }
 
 local function IsMasterSim()
@@ -79,15 +71,6 @@ local function MeteorsAreDisabled()
     local tuning = _G.TUNING
     return tuning.METEORSHOWER_BASEDELAY ~= nil
         and tuning.METEORSHOWER_BASEDELAY < 0
-end
-
-local function GetLightningGoatHuntChance()
-    local value = GetOverride("lightninggoat")
-    if type(value) == "number" then
-        return math.max(0, math.min(1, value))
-    end
-
-    return LIGHTNING_GOAT_HUNT_CHANCES[value] or LIGHTNING_GOAT_HUNT_CHANCES.default
 end
 
 local function FindEntityByPrefab(prefabs)
@@ -603,8 +586,25 @@ local function IsSavannaPoint(x, y, z)
         and _G.TheWorld.Map:GetTileAtPoint(x, y, z) == _G.WORLD_TILES.SAVANNA
 end
 
-local function SpawnBeefaloAt(x, y, z)
-    local beefalo = _G.SpawnPrefab("beefalo")
+local function IsSavannaNearby(x, y, z)
+    if IsSavannaPoint(x, y, z) then
+        return true
+    end
+
+    for radius = HUNT_SURPRISE_TERRAIN_SEARCH_STEP, HUNT_SURPRISE_TERRAIN_SEARCH_RADIUS, HUNT_SURPRISE_TERRAIN_SEARCH_STEP do
+        for i = 0, 7 do
+            local angle = i * _G.PI / 4
+            if IsSavannaPoint(x + math.cos(angle) * radius, y, z + math.sin(angle) * radius) then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+local function SpawnBabyBeefaloAt(x, y, z)
+    local beefalo = _G.SpawnPrefab("babybeefalo")
     if beefalo ~= nil then
         beefalo.Transform:SetPosition(x, y, z)
     end
@@ -617,23 +617,46 @@ local function TryBeefaloHuntSurprise(inst, data)
         or _G.TheWorld == nil
         or not _G.TheWorld.state.isspring
         or not _G.TheWorld.state.israining
-        or math.random() >= GetLightningGoatHuntChance() then
+        or inst.Transform == nil then
         return
     end
 
-    local x, y, z = inst.Transform:GetWorldPosition()
-    if not IsSavannaPoint(x, y, z) then
+    local pt = type(data) == "table" and data.pt or nil
+    local x, y, z
+    if pt ~= nil then
+        x, y, z = pt:Get()
+    else
+        x, y, z = inst.Transform:GetWorldPosition()
+    end
+    if not IsSavannaNearby(x, y, z) then
         return
     end
 
     inst:Remove()
-    local beefalo = SpawnBeefaloAt(x, y, z)
+    local beefalo = SpawnBabyBeefaloAt(x, y, z)
     if beefalo ~= nil then
-        beefalo:PushEvent("spawnedforhunt", data)
+        local event_data = data
+        if type(data) == "table" then
+            event_data = {}
+            for key, value in pairs(data) do
+                event_data[key] = value
+            end
+            event_data.beast = "babybeefalo"
+            event_data.pt = _G.Vector3(x, y, z)
+        end
+        beefalo:PushEvent("spawnedforhunt", event_data)
     end
 end
 
-for _, prefab in ipairs({ "koalefant_summer", "koalefant_winter" }) do
+for _, prefab in ipairs({
+    "koalefant_summer",
+    "koalefant_winter",
+    "lightninggoat",
+    "warg",
+    "spat",
+    "claywarg",
+    "yots_worm_lantern_spawner",
+}) do
     AddPrefabPostInit(prefab, function(inst)
         if not IsMasterSim() then
             return
