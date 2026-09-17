@@ -182,27 +182,6 @@ end
 
 AddLevelPreInitAny(ApplyLevelSetPieceConfig)
 
-if AddClassPostConstruct ~= nil then
-    AddClassPostConstruct("map/level", function(level)
-        if level.resource_null_filter_wrapped then
-            return
-        end
-
-        level.resource_null_filter_wrapped = true
-        local GetTasksForLevel = level.GetTasksForLevel
-        level.GetTasksForLevel = function(self, ...)
-            local tasklist = GetTasksForLevel(self, ...)
-            if type(tasklist) == "table" then
-                for _, task in ipairs(tasklist) do
-                    FilterTaskSetPieces(task)
-                end
-            end
-
-            return tasklist
-        end
-    end)
-end
-
 if AddTaskPreInitAny ~= nil then
     AddTaskPreInitAny(FilterTaskSetPieces)
 end
