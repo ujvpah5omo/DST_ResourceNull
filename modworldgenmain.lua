@@ -32,8 +32,8 @@ local RESOURCE_SETPIECE_CONFIGS =
 }
 
 local function RemoveDisabledSetPiecesFromLayoutSource(path)
-    local ok, data = pcall(require, path)
-    if not ok or type(data) ~= "table" then
+    local data = require(path)
+    if type(data) ~= "table" then
         return
     end
 
