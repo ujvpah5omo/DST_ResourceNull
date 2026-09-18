@@ -31,6 +31,29 @@ local RESOURCE_SETPIECE_CONFIGS =
     skeleton_wizard_fire = "setpiece_skeleton_wizard_fire",
 }
 
+local function RemoveDisabledSetPiecesFromLayoutSource(path)
+    local ok, data = pcall(require, path)
+    if not ok or type(data) ~= "table" then
+        return
+    end
+
+    for name, config_name in pairs(RESOURCE_SETPIECE_CONFIGS) do
+        if not ConfigEnabled(config_name) then
+            if type(data.Layouts) == "table" then
+                data.Layouts[name] = nil
+            end
+
+            if type(data.Sandbox) == "table" then
+                for _, area in pairs(data.Sandbox) do
+                    if type(area) == "table" then
+                        area[name] = nil
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function ShouldKeepSetPiece(name)
     local config_name = name ~= nil and RESOURCE_SETPIECE_CONFIGS[name] or nil
     return config_name == nil or ConfigEnabled(config_name)
@@ -111,6 +134,10 @@ local function ApplyLevelSetPieceConfig(level)
     RemoveDisabledNamedSetPieces(level.set_pieces)
     FilterRandomSetPieces(level)
 end
+
+RemoveDisabledSetPiecesFromLayoutSource("map/traps")
+RemoveDisabledSetPiecesFromLayoutSource("map/pointsofinterest")
+RemoveDisabledSetPiecesFromLayoutSource("map/protected_resources")
 
 AddLevelPreInitAny(ApplyLevelSetPieceConfig)
 

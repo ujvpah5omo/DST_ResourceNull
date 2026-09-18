@@ -1,6 +1,6 @@
 name = "无资源修正"
 author = "codex"
-version = "0.1.15"
+version = "0.1.16"
 forumthread = ""
 api_version = 10
 dst_compatible = true
@@ -179,12 +179,12 @@ configuration_options =
     },
     {
         name = "setpiece_sleeping_spider",
-        label = "睡蜘蛛草树苗奇遇",
-        hover = "控制睡觉蜘蛛陷阱；该布局会生成少量草和树苗。",
+        label = "睡蜘蛛植物陷阱",
+        hover = "控制睡觉蜘蛛陷阱；该布局会生成草丛、树苗和多枝树。",
         options =
         {
             { description = "开启", data = true, hover = "保留睡觉蜘蛛陷阱。" },
-            { description = "关闭", data = false, hover = "移除该布局，避免额外草和树苗。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免额外草丛、树苗和多枝树。" },
         },
         default = true,
     },
