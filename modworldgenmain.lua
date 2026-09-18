@@ -29,6 +29,9 @@ local RESOURCE_SETPIECE_CONFIGS =
     skeleton_hunter_swamp = "setpiece_skeleton_hunter_swamp",
     skeleton_wizard_ice = "setpiece_skeleton_wizard_ice",
     skeleton_wizard_fire = "setpiece_skeleton_wizard_fire",
+    skeleton_lightfarmer = "setpiece_skeleton_lightfarmer",
+
+    lures_and_worms = "setpiece_lures_and_worms",
 }
 
 local function RemoveDisabledSetPiecesFromLayoutSource(path)

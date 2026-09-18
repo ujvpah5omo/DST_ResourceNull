@@ -1,6 +1,6 @@
 name = "无资源修正"
 author = "codex"
-version = "0.1.17"
+version = "0.1.18"
 forumthread = ""
 api_version = 10
 dst_compatible = true
@@ -284,6 +284,28 @@ configuration_options =
         {
             { description = "开启", data = true, hover = "保留火法师骸骨树木。" },
             { description = "关闭", data = false, hover = "移除该布局，避免额外树木。" },
+        },
+        default = true,
+    },
+    {
+        name = "setpiece_skeleton_lightfarmer",
+        label = "荧光花农夫骸骨奇遇",
+        hover = "控制洞穴泥地的发光农夫骸骨；会生成荧光花、双朵荧光花和三朵荧光花。",
+        options =
+        {
+            { description = "开启", data = true, hover = "保留荧光花农夫骸骨布局。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免额外荧光花入口。" },
+        },
+        default = true,
+    },
+    {
+        name = "setpiece_lures_and_worms",
+        label = "发光浆果蠕虫奇遇",
+        hover = "控制洞穴泥地的发光浆果与蠕虫守护布局；会生成发光浆果植株和洞穴蠕虫生成点。",
+        options =
+        {
+            { description = "开启", data = true, hover = "保留发光浆果蠕虫布局。" },
+            { description = "关闭", data = false, hover = "移除该布局，避免发光浆果植株和洞穴蠕虫入口。" },
         },
         default = true,
     },
