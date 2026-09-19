@@ -11,6 +11,9 @@ local prefabs =
 }
 
 local WARG_SPAWN_ATTEMPTS = 16
+local LUNAR_RIFT_COLOUR_R = 0.35
+local LUNAR_RIFT_COLOUR_G = 0.95
+local LUNAR_RIFT_COLOUR_B = 1
 
 local function GetVerb()
     return "INVESTIGATE"
@@ -107,12 +110,10 @@ local function fn()
     inst.AnimState:SetBank("track")
     inst.AnimState:SetBuild("koalefant_tracks")
     inst.AnimState:SetRayTestOnBB(true)
-    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-    inst.AnimState:SetLayer(LAYER_BACKGROUND)
-    inst.AnimState:SetSortOrder(3)
-    inst.AnimState:PlayAnimation("idle")
-    inst.AnimState:SetMultColour(0.65, 0.85, 1, 1)
+    inst.AnimState:PlayAnimation("idle_pile_tooth")
+    inst.AnimState:SetMultColour(LUNAR_RIFT_COLOUR_R, LUNAR_RIFT_COLOUR_G, LUNAR_RIFT_COLOUR_B, 1)
 
+    inst:AddTag("dirtpile")
     inst:AddTag("track")
     inst:AddTag("inspectable")
     inst:AddTag("resource_null_lunar_warg_fix")
