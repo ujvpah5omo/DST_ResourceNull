@@ -14,6 +14,7 @@ local prefabs =
 local WARG_SPAWN_ATTEMPTS = 16
 local CLAW_TRACK_COUNT = 4
 local CLAW_TRACK_ANGLE_DEVIATION = PI / 7
+local DUPLICATE_CLUE_CLEANUP_RADIUS = 36
 local LUNAR_RIFT_COLOUR_R = 0.35
 local LUNAR_RIFT_COLOUR_G = 0.95
 local LUNAR_RIFT_COLOUR_B = 1
@@ -102,6 +103,29 @@ local function SpawnClawTracks(inst)
     inst.resource_null_lunar_warg_claw_tracks = tracks
 end
 
+local function RemoveDuplicateClues(inst)
+    local x = inst.resource_null_lunar_warg_spawn_x
+    local y = inst.resource_null_lunar_warg_spawn_y or 0
+    local z = inst.resource_null_lunar_warg_spawn_z
+    if x == nil or z == nil then
+        x, y, z = inst.Transform:GetWorldPosition()
+    end
+
+    local clues = TheSim:FindEntities(
+        x,
+        y,
+        z,
+        DUPLICATE_CLUE_CLEANUP_RADIUS,
+        { "resource_null_lunar_warg_clue" },
+        { "INLIMBO" }
+    )
+    for _, clue in ipairs(clues) do
+        if clue ~= inst and clue:IsValid() then
+            clue:Remove()
+        end
+    end
+end
+
 local function OnSave(inst, data)
     data.resource_null_lunar_warg_spawn_x = inst.resource_null_lunar_warg_spawn_x
     data.resource_null_lunar_warg_spawn_y = inst.resource_null_lunar_warg_spawn_y
@@ -125,6 +149,7 @@ local function OnInvestigated(inst, doer)
     local spawn_pt = GetDirectedSpawnPoint(inst)
 
     SpawnPrefab("small_puff").Transform:SetPosition(x, y, z)
+    RemoveDuplicateClues(inst)
     RemoveClawTracks(inst)
     inst:Remove()
 

@@ -15,6 +15,7 @@ local SPAWN_FALLBACK_RELOCATE_DISTANCE_SQ = 20 * 20
 local CELESTIAL_ORB_METEOR_TIMEOUT = 120
 local HUNT_SURPRISE_TERRAIN_SEARCH_RADIUS = 16
 local HUNT_SURPRISE_TERRAIN_SEARCH_STEP = 4
+local LUNAR_WARG_CLUE_DEDUPE_RADIUS = 36
 
 local LUNAR_ISLAND_NODE_TAGS =
 {
@@ -508,44 +509,95 @@ local function RemoveLiveLunarWargForRift(rift_guid)
     end
 end
 
+local function BindLunarWargClueToRift(anchor, clue, state)
+    anchor.resource_null_lunar_warg_clue_done = true
+    clue.resource_null_lunar_warg_spawn_x,
+    clue.resource_null_lunar_warg_spawn_y,
+    clue.resource_null_lunar_warg_spawn_z = anchor.Transform:GetWorldPosition()
+    clue.resource_null_lunar_rift_guid = anchor.GUID
+    anchor.resource_null_lunar_warg_clue = clue
+    state:MarkLunarWargRift(anchor.GUID, "spawned")
+
+    if clue.resource_null_lunar_warg_anchor_guid == anchor.GUID then
+        return
+    end
+
+    clue.resource_null_lunar_warg_anchor_guid = anchor.GUID
+
+    anchor:ListenForEvent("onremove", function()
+        if clue:IsValid() then
+            clue:Remove()
+        end
+        RemoveLiveLunarWargForRift(anchor.GUID)
+        state:ClearLunarWargRift(anchor.GUID)
+    end)
+
+    clue:ListenForEvent("onremove", function()
+        if anchor:IsValid() and anchor.resource_null_lunar_warg_clue == clue then
+            anchor.resource_null_lunar_warg_clue = nil
+        end
+    end)
+end
+
+local function FindExistingLunarWargClueNear(anchor)
+    local x, y, z = anchor.Transform:GetWorldPosition()
+    local clues = _G.TheSim:FindEntities(
+        x,
+        y,
+        z,
+        LUNAR_WARG_CLUE_DEDUPE_RADIUS,
+        { "resource_null_lunar_warg_clue" },
+        { "INLIMBO" }
+    )
+    local keep_clue = nil
+    local keep_dist_sq = nil
+
+    for _, clue in ipairs(clues) do
+        if clue:IsValid() and clue.Transform ~= nil then
+            local clue_x, _, clue_z = clue.Transform:GetWorldPosition()
+            local dx = clue_x - x
+            local dz = clue_z - z
+            local dist_sq = dx * dx + dz * dz
+            if keep_clue == nil or dist_sq < keep_dist_sq then
+                if keep_clue ~= nil and keep_clue:IsValid() then
+                    keep_clue:Remove()
+                end
+                keep_clue = clue
+                keep_dist_sq = dist_sq
+            else
+                clue:Remove()
+            end
+        end
+    end
+
+    return keep_clue
+end
+
 local function SpawnLunarWargClueNear(anchor)
     local state = GetWorldState()
     if anchor == nil
         or anchor.Transform == nil
-        or anchor.resource_null_lunar_warg_clue_done
         or state == nil
-        or state:IsLunarWargRiftDone(anchor.GUID)
         or not ShouldSpawnLunarWargClue() then
+        return
+    end
+
+    local existing_clue = FindExistingLunarWargClueNear(anchor)
+    if existing_clue ~= nil then
+        BindLunarWargClueToRift(anchor, existing_clue, state)
+        return
+    end
+
+    if anchor.resource_null_lunar_warg_clue_done or state:IsLunarWargRiftDone(anchor.GUID) then
         return
     end
 
     local x, y, z = FindSpawnPointNear(anchor, 10, 18)
     local clue = _G.SpawnPrefab("resource_null_lunar_warg_clue")
     if clue ~= nil then
-        anchor.resource_null_lunar_warg_clue_done = true
         clue.Transform:SetPosition(x, y, z)
         clue:FacePoint(anchor.Transform:GetWorldPosition())
-        clue.resource_null_lunar_warg_spawn_x,
-        clue.resource_null_lunar_warg_spawn_y,
-        clue.resource_null_lunar_warg_spawn_z = anchor.Transform:GetWorldPosition()
-        clue.resource_null_lunar_rift_guid = anchor.GUID
-        anchor.resource_null_lunar_warg_clue = clue
-        state:MarkLunarWargRift(anchor.GUID, "spawned")
-
-        anchor:ListenForEvent("onremove", function()
-            if clue:IsValid() then
-                clue:Remove()
-            end
-            RemoveLiveLunarWargForRift(anchor.GUID)
-            state:ClearLunarWargRift(anchor.GUID)
-        end)
-
-        clue:ListenForEvent("onremove", function()
-            if anchor:IsValid() and anchor.resource_null_lunar_warg_clue == clue then
-                anchor.resource_null_lunar_warg_clue = nil
-            end
-        end)
-
+        BindLunarWargClueToRift(anchor, clue, state)
         state.lunar_warg_clue_spawned_count = (state.lunar_warg_clue_spawned_count or 0) + 1
     end
 end
