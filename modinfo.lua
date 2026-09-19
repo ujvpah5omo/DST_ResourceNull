@@ -1,6 +1,6 @@
 name = "无资源修正"
 author = "codex"
-version = "0.1.18"
+version = "0.1.19"
 forumthread = ""
 api_version = 10
 dst_compatible = true
@@ -37,10 +37,10 @@ configuration_options =
     {
         name = "beefalo_hunt_surprise",
         label = "小皮弗娄牛狩猎惊喜",
-        hover = "春天雨天，狩猎终点位于稀树草原附近时，必定出现一只小皮弗娄牛。",
+        hover = "春天雨天，狩猎终点位于稀树草原附近时，考拉象改为小皮弗娄牛；座狼或钢羊会额外带出一只被攻击的小牛。",
         options =
         {
-            { description = "开启", data = true, hover = "像原版春雨绿洲沙漠必出电羊一样，春雨草原狩猎终点必出一只小皮弗娄牛。" },
+            { description = "开启", data = true, hover = "像原版春雨绿洲沙漠必出电羊一样，春雨草原狩猎终点触发小皮弗娄牛惊喜；危险猎物会攻击小牛，需要玩家救援。" },
             { description = "关闭", data = false, hover = "不调整狩猎惊喜。" },
         },
         default = true,

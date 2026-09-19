@@ -612,12 +612,85 @@ local function SpawnBabyBeefaloAt(x, y, z)
     return beefalo
 end
 
+local function IsHuntBeefaloReplacement(prefab)
+    return prefab == "koalefant_summer"
+        or prefab == "koalefant_winter"
+end
+
+local function IsHuntBeefaloThreat(prefab)
+    return prefab == "warg"
+        or prefab == "claywarg"
+        or prefab == "spat"
+end
+
+local function IsSafeHuntSpawnPoint(x, y, z)
+    return _G.TheWorld == nil
+        or _G.TheWorld.Map == nil
+        or _G.TheWorld.Map.IsPassableAtPoint == nil
+        or _G.TheWorld.Map:IsPassableAtPoint(x, y, z)
+end
+
+local function FindBabyBeefaloRescuePoint(inst, x, y, z)
+    local center_x, center_y, center_z = x, y, z
+    if inst.Transform ~= nil then
+        center_x, center_y, center_z = inst.Transform:GetWorldPosition()
+    end
+
+    local start_angle = math.random() * _G.PI * 2
+    for i = 0, 7 do
+        local angle = start_angle + i * _G.PI / 4
+        local spawn_x = center_x + math.cos(angle) * 3
+        local spawn_z = center_z + math.sin(angle) * 3
+        if IsSafeHuntSpawnPoint(spawn_x, center_y, spawn_z) then
+            return spawn_x, center_y, spawn_z
+        end
+    end
+
+    return x, y, z
+end
+
+local function PushBabyBeefaloHuntEvent(beefalo, data, x, y, z)
+    if beefalo == nil then
+        return
+    end
+
+    local event_data = data
+    if type(data) == "table" then
+        event_data = {}
+        for key, value in pairs(data) do
+            event_data[key] = value
+        end
+        event_data.beast = "babybeefalo"
+        event_data.pt = _G.Vector3(x, y, z)
+    end
+
+    beefalo:PushEvent("spawnedforhunt", event_data)
+end
+
+local function MakeHuntThreatAttackBaby(threat, beefalo)
+    if threat == nil or beefalo == nil then
+        return
+    end
+
+    if threat.components ~= nil and threat.components.combat ~= nil then
+        threat.components.combat:SetTarget(beefalo)
+    end
+    threat:PushEvent("attacked", { attacker = beefalo, damage = 0 })
+end
+
 local function TryBeefaloHuntSurprise(inst, data)
     if not GetModConfigData("beefalo_hunt_surprise")
         or _G.TheWorld == nil
         or not _G.TheWorld.state.isspring
         or not _G.TheWorld.state.israining
         or inst.Transform == nil then
+        return
+    end
+
+    local prefab = inst.prefab
+    local replace_target = IsHuntBeefaloReplacement(prefab)
+    local add_to_threat = IsHuntBeefaloThreat(prefab)
+    if not replace_target and not add_to_threat then
         return
     end
 
@@ -632,30 +705,24 @@ local function TryBeefaloHuntSurprise(inst, data)
         return
     end
 
-    inst:Remove()
-    local beefalo = SpawnBabyBeefaloAt(x, y, z)
-    if beefalo ~= nil then
-        local event_data = data
-        if type(data) == "table" then
-            event_data = {}
-            for key, value in pairs(data) do
-                event_data[key] = value
-            end
-            event_data.beast = "babybeefalo"
-            event_data.pt = _G.Vector3(x, y, z)
-        end
-        beefalo:PushEvent("spawnedforhunt", event_data)
+    if replace_target then
+        inst:Remove()
+        local beefalo = SpawnBabyBeefaloAt(x, y, z)
+        PushBabyBeefaloHuntEvent(beefalo, data, x, y, z)
+    elseif add_to_threat then
+        local spawn_x, spawn_y, spawn_z = FindBabyBeefaloRescuePoint(inst, x, y, z)
+        local beefalo = SpawnBabyBeefaloAt(spawn_x, spawn_y, spawn_z)
+        PushBabyBeefaloHuntEvent(beefalo, data, spawn_x, spawn_y, spawn_z)
+        MakeHuntThreatAttackBaby(inst, beefalo)
     end
 end
 
 for _, prefab in ipairs({
     "koalefant_summer",
     "koalefant_winter",
-    "lightninggoat",
     "warg",
     "spat",
     "claywarg",
-    "yots_worm_lantern_spawner",
 }) do
     AddPrefabPostInit(prefab, function(inst)
         if not IsMasterSim() then
