@@ -1,6 +1,6 @@
 name = "无资源修正"
 author = "codex"
-version = "0.1.20"
+version = "0.1.21"
 forumthread = ""
 api_version = 10
 dst_compatible = true
