@@ -675,6 +675,26 @@ local function IsHuntBeefaloThreat(prefab)
         or prefab == "spat"
 end
 
+local function ApplyHuntCooldownMultiplier()
+    local multiplier = GetModConfigData("hunt_cooldown_multiplier")
+    if type(multiplier) ~= "number"
+        or multiplier <= 1
+        or IsCave()
+        or _G.TheWorld.resource_null_hunt_cooldown_multiplier_applied then
+        return
+    end
+
+    _G.TheWorld.resource_null_hunt_cooldown_multiplier_applied = true
+
+    if _G.TUNING.HUNT_COOLDOWN ~= nil and _G.TUNING.HUNT_COOLDOWN > 0 then
+        _G.TUNING.HUNT_COOLDOWN = _G.TUNING.HUNT_COOLDOWN * multiplier
+    end
+
+    if _G.TUNING.HUNT_COOLDOWNDEVIATION ~= nil and _G.TUNING.HUNT_COOLDOWNDEVIATION > 0 then
+        _G.TUNING.HUNT_COOLDOWNDEVIATION = _G.TUNING.HUNT_COOLDOWNDEVIATION * multiplier
+    end
+end
+
 local function IsSafeHuntSpawnPoint(x, y, z)
     return _G.TheWorld == nil
         or _G.TheWorld.Map == nil
@@ -794,6 +814,7 @@ AddPrefabPostInit("world", function(inst)
         inst:AddComponent("resource_null_worldstate")
     end
 
+    ApplyHuntCooldownMultiplier()
     inst:DoTaskInTime(2, SpawnCelestialOrbCompensation)
     inst:DoPeriodicTask(30, SpawnCelestialOrbCompensation)
     inst:DoTaskInTime(10, SpawnLunarWargClue)

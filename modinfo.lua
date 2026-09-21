@@ -1,6 +1,6 @@
 name = "无资源修正"
 author = "codex"
-version = "0.1.23"
+version = "0.1.24"
 forumthread = ""
 api_version = 10
 dst_compatible = true
@@ -44,6 +44,28 @@ configuration_options =
             { description = "关闭", data = false, hover = "不调整狩猎惊喜。" },
         },
         default = true,
+    },
+    {
+        name = "hunt_cooldown_multiplier",
+        label = "狩猎刷新间隔",
+        hover = "调整原版狩猎冷却时间；只影响新狩猎刷新间隔，不改变脚印数量和狩猎惊喜概率。",
+        options =
+        {
+            { description = "原版", data = 1, hover = "不调整原版狩猎冷却。" },
+            { description = "2 倍", data = 2, hover = "狩猎冷却时间翻倍；例如“较少”约从 2.1-2.7 天变为 4.2-5.4 天。" },
+            { description = "3 倍", data = 3, hover = "狩猎冷却时间变为三倍；例如“较少”约从 2.1-2.7 天变为 6.3-8.1 天。" },
+        },
+        default = 1,
+    },
+    {
+        name = "section_boon_compensation",
+        label = "──── 补给奇遇 ────",
+        hover = "下面是奖励物资奇遇（boons）的补偿设置。",
+        options =
+        {
+            { description = "────", data = false },
+        },
+        default = false,
     },
     {
         name = "boon_cooking",
@@ -122,6 +144,16 @@ configuration_options =
             { description = "关闭", data = "off", hover = "移除该奇遇。" },
         },
         default = "default",
+    },
+    {
+        name = "section_skeleton_compensation",
+        label = "──── 骸骨奇遇 ────",
+        hover = "下面是骸骨兴趣点奇遇（pointsofinterest）的补偿设置。",
+        options =
+        {
+            { description = "────", data = false },
+        },
+        default = false,
     },
     {
         name = "setpiece_skeleton_trapper",
@@ -239,6 +271,16 @@ configuration_options =
             { description = "关闭", data = "off", hover = "移除该骸骨奇遇。" },
         },
         default = "default",
+    },
+    {
+        name = "section_disabled_resource_setpieces",
+        label = "──── 禁用奇遇 ────",
+        hover = "下面是影响无资源设定的资源奇遇开关。",
+        options =
+        {
+            { description = "────", data = false },
+        },
+        default = false,
     },
     {
         name = "setpiece_leif_forest",
