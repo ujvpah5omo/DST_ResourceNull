@@ -1,6 +1,6 @@
 name = "无资源修正"
 author = "codex"
-version = "0.1.22"
+version = "0.1.23"
 forumthread = ""
 api_version = 10
 dst_compatible = true
@@ -44,6 +44,201 @@ configuration_options =
             { description = "关闭", data = false, hover = "不调整狩猎惊喜。" },
         },
         default = true,
+    },
+    {
+        name = "boon_cooking",
+        label = "【补给】烹饪补给奇遇",
+        hover = "控制 CookingBoon；可作为无资源设定下的一次性烹饪补偿，会出现锅和烹饪相关物品。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版随机规则生成。" },
+            { description = "优先", data = "priority", hover = "不增加补给奇遇数量；原版本轮生成补给奇遇时，优先从设置为优先的补给里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "boon_fishing",
+        label = "【补给】海钓补给奇遇",
+        hover = "控制 FishingBoon；可作为无资源设定下的一次性海钓补偿。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版随机规则生成。" },
+            { description = "优先", data = "priority", hover = "不增加补给奇遇数量；原版本轮生成补给奇遇时，优先从设置为优先的补给里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "boon_farming",
+        label = "【补给】种田补给奇遇",
+        hover = "控制 FarmingBoon；可作为无资源设定下的一次性种田补偿。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版随机规则生成。" },
+            { description = "优先", data = "priority", hover = "不增加补给奇遇数量；原版本轮生成补给奇遇时，优先从设置为优先的补给里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "boon_level2_wood",
+        label = "【补给】二级木材补给奇遇",
+        hover = "控制 Level2WoodBoon；可作为无资源设定下的一次性木材补偿。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版随机规则生成。" },
+            { description = "优先", data = "priority", hover = "不增加补给奇遇数量；原版本轮生成补给奇遇时，优先从设置为优先的补给里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "boon_level2_rock",
+        label = "【补给】二级石材补给奇遇",
+        hover = "控制 Level2RockBoon；可作为无资源设定下的一次性石材补偿。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版随机规则生成。" },
+            { description = "优先", data = "priority", hover = "不增加补给奇遇数量；原版本轮生成补给奇遇时，优先从设置为优先的补给里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "boon_level2_grass",
+        label = "【补给】二级草补给奇遇",
+        hover = "控制 Level2GrassBoon；可作为无资源设定下的一次性草类补偿。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版随机规则生成。" },
+            { description = "优先", data = "priority", hover = "不增加补给奇遇数量；原版本轮生成补给奇遇时，优先从设置为优先的补给里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "setpiece_skeleton_trapper",
+        label = "【骸骨】捕猎者骸骨",
+        hover = "控制 skeleton_trapper；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
+            { description = "优先", data = "priority", hover = "原版本轮生成兴趣点时，优先从设置为优先的骸骨奇遇里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从兴趣点随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该骸骨奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "setpiece_skeleton_entomologist",
+        label = "【骸骨】昆虫学家骸骨",
+        hover = "控制 skeleton_entomologist；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
+            { description = "优先", data = "priority", hover = "原版本轮生成兴趣点时，优先从设置为优先的骸骨奇遇里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从兴趣点随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该骸骨奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "setpiece_skeleton_miner_dirt",
+        label = "【骸骨】泥地矿工骸骨",
+        hover = "控制 skeleton_miner_dirt；会生成树精，优先时可作为少量活木补充来源。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
+            { description = "优先", data = "priority", hover = "原版本轮生成兴趣点时，优先从设置为优先的骸骨奇遇里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从兴趣点随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该骸骨奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "setpiece_skeleton_miner",
+        label = "【骸骨】矿工骸骨",
+        hover = "控制 skeleton_miner；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
+            { description = "优先", data = "priority", hover = "原版本轮生成兴趣点时，优先从设置为优先的骸骨奇遇里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从兴趣点随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该骸骨奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "setpiece_skeleton_camper",
+        label = "【骸骨】露营者骸骨",
+        hover = "控制 skeleton_camper；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
+            { description = "优先", data = "priority", hover = "原版本轮生成兴趣点时，优先从设置为优先的骸骨奇遇里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从兴趣点随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该骸骨奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "setpiece_skeleton_construction",
+        label = "【骸骨】建造者骸骨",
+        hover = "控制 skeleton_construction；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
+            { description = "优先", data = "priority", hover = "原版本轮生成兴趣点时，优先从设置为优先的骸骨奇遇里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从兴趣点随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该骸骨奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "setpiece_skeleton_night_hunter",
+        label = "【骸骨】夜猎者骸骨",
+        hover = "控制 skeleton_night_hunter；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
+            { description = "优先", data = "priority", hover = "原版本轮生成兴趣点时，优先从设置为优先的骸骨奇遇里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从兴趣点随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该骸骨奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "setpiece_skeleton_rain_coat",
+        label = "【骸骨】雨具骸骨",
+        hover = "控制 skeleton_rain_coat；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
+            { description = "优先", data = "priority", hover = "原版本轮生成兴趣点时，优先从设置为优先的骸骨奇遇里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从兴趣点随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该骸骨奇遇。" },
+        },
+        default = "default",
+    },
+    {
+        name = "setpiece_skeleton_winter_hard",
+        label = "【骸骨】困难冬季骸骨",
+        hover = "控制 skeleton_winter_hard；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        options =
+        {
+            { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
+            { description = "优先", data = "priority", hover = "原版本轮生成兴趣点时，优先从设置为优先的骸骨奇遇里随机。" },
+            { description = "必出 1 个", data = "required", hover = "世界生成时强制出现 1 个；若加入必出池则不再从兴趣点随机池重复抽取。" },
+            { description = "关闭", data = "off", hover = "移除该骸骨奇遇。" },
+        },
+        default = "default",
     },
     {
         name = "setpiece_leif_forest",
@@ -240,17 +435,6 @@ configuration_options =
         {
             { description = "开启", data = true, hover = "保留科技站废墟 3。" },
             { description = "关闭", data = false, hover = "移除该布局，避免浆果丛、树苗、蜂箱和树木入口。" },
-        },
-        default = true,
-    },
-    {
-        name = "setpiece_skeleton_miner_dirt",
-        label = "泥地矿工树精奇遇",
-        hover = "控制泥地矿工骸骨；该布局会生成树精。",
-        options =
-        {
-            { description = "开启", data = true, hover = "保留泥地矿工树精布局。" },
-            { description = "关闭", data = false, hover = "移除该布局，避免活木入口。" },
         },
         default = true,
     },
