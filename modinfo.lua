@@ -1,6 +1,6 @@
 name = "无资源修正"
 author = "codex"
-version = "0.1.24"
+version = "0.1.25"
 forumthread = ""
 api_version = 10
 dst_compatible = true
@@ -70,7 +70,7 @@ configuration_options =
     {
         name = "boon_cooking",
         label = "【补给】烹饪补给奇遇",
-        hover = "控制 CookingBoon；可作为无资源设定下的一次性烹饪补偿，会出现锅和烹饪相关物品。",
+        hover = "控制烹饪补给奇遇；可作为无资源设定下的一次性烹饪补偿。物品/备注：食谱卡 x2、烹饪书、腐烂食物/鱼；会给成品锅。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版随机规则生成。" },
@@ -83,7 +83,7 @@ configuration_options =
     {
         name = "boon_fishing",
         label = "【补给】海钓补给奇遇",
-        hover = "控制 FishingBoon；可作为无资源设定下的一次性海钓补偿。",
+        hover = "控制海钓补给奇遇；可作为无资源设定下的一次性海钓补偿。物品/备注：海钓竿、浮标/拟饵、腐烂小鱼、饰品。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版随机规则生成。" },
@@ -96,7 +96,7 @@ configuration_options =
     {
         name = "boon_farming",
         label = "【补给】种田补给奇遇",
-        hover = "控制 FarmingBoon；可作为无资源设定下的一次性种田补偿。",
+        hover = "控制种田补给奇遇；可作为无资源设定下的一次性种田补偿。物品/备注：耕地机物品、植物登记帽、粪肥、鸟粪、腐烂食物。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版随机规则生成。" },
@@ -109,7 +109,7 @@ configuration_options =
     {
         name = "boon_level2_wood",
         label = "【补给】二级木材补给奇遇",
-        hover = "控制 Level2WoodBoon；可作为无资源设定下的一次性木材补偿。",
+        hover = "控制二级木材补给奇遇；可作为无资源设定下的一次性木材补偿。物品/备注：木甲/斧头、木板。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版随机规则生成。" },
@@ -122,7 +122,7 @@ configuration_options =
     {
         name = "boon_level2_rock",
         label = "【补给】二级石材补给奇遇",
-        hover = "控制 Level2RockBoon；可作为无资源设定下的一次性石材补偿。",
+        hover = "控制二级石材补给奇遇；可作为无资源设定下的一次性石材补偿。物品/备注：镐子、石头、火药、石砖。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版随机规则生成。" },
@@ -135,7 +135,7 @@ configuration_options =
     {
         name = "boon_level2_grass",
         label = "【补给】二级草补给奇遇",
-        hover = "控制 Level2GrassBoon；可作为无资源设定下的一次性草类补偿。",
+        hover = "控制二级草补给奇遇；可作为无资源设定下的一次性草类补偿。物品/备注：火把/陷阱、绳子。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版随机规则生成。" },
@@ -158,7 +158,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_trapper",
         label = "【骸骨】捕猎者骸骨",
-        hover = "控制 skeleton_trapper；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        hover = "控制捕猎者骸骨；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。物品/备注：捕鸟陷阱、陷阱、蓝图、灌木帽、绳子、腐烂食物。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
@@ -171,7 +171,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_entomologist",
         label = "【骸骨】昆虫学家骸骨",
-        hover = "控制 skeleton_entomologist；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        hover = "控制昆虫学家骸骨；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。物品/备注：捕虫网、蜂帽、蜂雷、蓝图、蜂刺。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
@@ -184,7 +184,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_miner_dirt",
         label = "【骸骨】泥地矿工骸骨",
-        hover = "控制 skeleton_miner_dirt；会生成树精，优先时可作为少量活木补充来源。",
+        hover = "控制泥地矿工骸骨；会生成树精，优先时可作为少量活木补充来源。物品/备注：金块、矿工帽、镐子、石头；树精 x4。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
@@ -197,7 +197,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_miner",
         label = "【骸骨】矿工骸骨",
-        hover = "控制 skeleton_miner；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        hover = "控制矿工骸骨；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。物品/备注：金块、矿工帽、镐子、石头。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
@@ -210,7 +210,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_camper",
         label = "【骸骨】露营者骸骨",
-        hover = "控制 skeleton_camper；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        hover = "控制露营者骸骨；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。物品/备注：背包、草席卷、绳子、腐烂食物、草帽。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
@@ -223,7 +223,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_construction",
         label = "【骸骨】建造者骸骨",
-        hover = "控制 skeleton_construction；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        hover = "控制建造者骸骨；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。物品/备注：蓝图、木板、石砖、橄榄球头盔、锤子、绳子。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
@@ -236,7 +236,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_night_hunter",
         label = "【骸骨】夜猎者骸骨",
-        hover = "控制 skeleton_night_hunter；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        hover = "控制夜猎者骸骨；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。物品/备注：木甲、鼹鼠帽、晨星。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
@@ -249,7 +249,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_rain_coat",
         label = "【骸骨】雨具骸骨",
-        hover = "控制 skeleton_rain_coat；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        hover = "控制雨具骸骨；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。物品/备注：草、猪皮、雨衣、雨帽。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
@@ -262,7 +262,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_winter_hard",
         label = "【骸骨】困难冬季骸骨",
-        hover = "控制 skeleton_winter_hard；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。",
+        hover = "控制困难冬季骸骨；优先时不增加兴趣点数量，只在原版生成兴趣点时优先进入候选池。物品/备注：蓝图、冬象背心。",
         options =
         {
             { description = "原版", data = "default", hover = "按原版兴趣点池随机生成。" },
@@ -285,7 +285,7 @@ configuration_options =
     {
         name = "setpiece_leif_forest",
         label = "树精森林奇遇",
-        hover = "控制树精守护森林；该布局会生成大量树和树精。",
+        hover = "控制树精守护森林；该布局会生成大量树和树精。物品/备注：常青树 x41、树精 x10。",
         options =
         {
             { description = "开启", data = true, hover = "保留树精森林。" },
@@ -296,7 +296,7 @@ configuration_options =
     {
         name = "setpiece_spider_forest",
         label = "蜘蛛森林奇遇",
-        hover = "控制蜘蛛守护森林；该布局会生成蜘蛛巢和树。",
+        hover = "控制蜘蛛守护森林；该布局会生成蜘蛛巢和树。物品/备注：蜘蛛巢 x12、大量常青树。",
         options =
         {
             { description = "开启", data = true, hover = "保留蜘蛛森林。" },
@@ -307,7 +307,7 @@ configuration_options =
     {
         name = "setpiece_pigguard_berries",
         label = "猪人守卫浆果奇遇",
-        hover = "控制猪人守卫浆果布局；会生成浆果丛。",
+        hover = "控制猪人守卫浆果布局；会生成浆果丛。物品/备注：浆果丛 x20、多汁浆果丛 x12、猪人火炬 x8。",
         options =
         {
             { description = "开启", data = true, hover = "保留猪人守卫浆果布局。" },
@@ -318,7 +318,7 @@ configuration_options =
     {
         name = "setpiece_pigguard_berries_easy",
         label = "简单猪人守卫浆果奇遇",
-        hover = "控制简单版猪人守卫浆果布局；会生成浆果丛。",
+        hover = "控制简单版猪人守卫浆果布局；会生成浆果丛。物品/备注：浆果丛 x22、多汁浆果丛 x16、猪人火炬 x1。",
         options =
         {
             { description = "开启", data = true, hover = "保留简单猪人守卫浆果布局。" },
@@ -329,7 +329,7 @@ configuration_options =
     {
         name = "setpiece_pigguard_grass",
         label = "猪人守卫草奇遇",
-        hover = "控制猪人守卫草丛布局；会生成草丛。",
+        hover = "控制猪人守卫草丛布局；会生成草丛。物品/备注：草丛 x50、猪人火炬 x8。",
         options =
         {
             { description = "开启", data = true, hover = "保留猪人守卫草布局。" },
@@ -340,7 +340,7 @@ configuration_options =
     {
         name = "setpiece_pigguard_grass_easy",
         label = "简单猪人守卫草奇遇",
-        hover = "控制简单版猪人守卫草丛布局；会生成草丛。",
+        hover = "控制简单版猪人守卫草丛布局；会生成草丛。物品/备注：草丛 x44、猪人火炬 x4。",
         options =
         {
             { description = "开启", data = true, hover = "保留简单猪人守卫草布局。" },
@@ -351,7 +351,7 @@ configuration_options =
     {
         name = "setpiece_wasphive_grass_easy",
         label = "蜂巢草地奇遇",
-        hover = "控制杀人蜂巢守草布局；会生成草丛和杀人蜂巢。",
+        hover = "控制杀人蜂巢守草布局；会生成草丛和杀人蜂巢。物品/备注：草丛 x46、杀人蜂巢 x3。",
         options =
         {
             { description = "开启", data = true, hover = "保留蜂巢草地布局。" },
@@ -362,7 +362,7 @@ configuration_options =
     {
         name = "setpiece_tenticle_reeds",
         label = "触手芦苇奇遇",
-        hover = "控制触手守芦苇布局；会生成大量芦苇。",
+        hover = "控制触手守芦苇布局；会生成大量芦苇。物品/备注：芦苇 x55、触手 x76。",
         options =
         {
             { description = "开启", data = true, hover = "保留触手芦苇布局。" },
@@ -373,7 +373,7 @@ configuration_options =
     {
         name = "setpiece_tallbird_rocks",
         label = "高脚鸟岩石奇遇",
-        hover = "控制高脚鸟守岩石布局；会生成高脚鸟巢。",
+        hover = "控制高脚鸟守岩石布局；会生成高脚鸟巢。物品/备注：高脚鸟巢 x17、岩石/矿石。",
         options =
         {
             { description = "开启", data = true, hover = "保留高脚鸟岩石布局。" },
@@ -384,7 +384,7 @@ configuration_options =
     {
         name = "setpiece_hound_rocks",
         label = "猎犬丘岩石奇遇",
-        hover = "控制猎犬丘守岩石布局；会生成猎犬丘。",
+        hover = "控制猎犬丘守岩石布局；会生成猎犬丘。物品/备注：猎犬丘 x10、岩石/矿石。",
         options =
         {
             { description = "开启", data = true, hover = "保留猎犬丘岩石布局。" },
@@ -395,7 +395,7 @@ configuration_options =
     {
         name = "setpiece_rotted_base",
         label = "腐烂营地资源奇遇",
-        hover = "控制腐烂营地；该布局会生成池塘、芦苇和针刺树。",
+        hover = "控制腐烂营地；该布局会生成池塘、芦苇和针刺树。物品/备注：箱子、猪头、腐烂食物、骸骨。",
         options =
         {
             { description = "开启", data = true, hover = "保留腐烂营地。" },
@@ -406,7 +406,7 @@ configuration_options =
     {
         name = "setpiece_beefalo_farm",
         label = "牛农场草丛奇遇",
-        hover = "控制牛农场陷阱布局；该布局会生成少量草丛。",
+        hover = "控制牛农场陷阱布局；该布局会生成少量草丛。物品/备注：木墙、箱子、牛毛、猪头、骨头。",
         options =
         {
             { description = "开启", data = true, hover = "保留牛农场布局。" },
@@ -417,7 +417,7 @@ configuration_options =
     {
         name = "setpiece_sleeping_spider",
         label = "睡蜘蛛植物陷阱",
-        hover = "控制睡觉蜘蛛陷阱；该布局会生成草丛、树苗和多枝树。",
+        hover = "控制睡觉蜘蛛陷阱；该布局会生成草丛、树苗和多枝树。物品/备注：蜘蛛战士、干草墙、猪头、骨头。",
         options =
         {
             { description = "开启", data = true, hover = "保留睡觉蜘蛛陷阱。" },
@@ -428,7 +428,7 @@ configuration_options =
     {
         name = "setpiece_chilled_base",
         label = "冰冻营地植物奇遇",
-        hover = "控制冰冻营地；该布局会生成少量草、树苗和树。",
+        hover = "控制冰冻营地；该布局会生成少量草、树苗和树。物品/备注：草丛、树苗、树。",
         options =
         {
             { description = "开启", data = true, hover = "保留冰冻营地。" },
@@ -439,7 +439,7 @@ configuration_options =
     {
         name = "setpiece_dev_graveyard",
         label = "墓地树木奇遇",
-        hover = "控制开发者墓地；该布局会生成树和恶魔花。",
+        hover = "控制开发者墓地；该布局会生成树和恶魔花。物品/备注：大理石柱、麦斯威尔雕像、铲子。",
         options =
         {
             { description = "开启", data = true, hover = "保留开发者墓地。" },
@@ -450,7 +450,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_researchlab1",
         label = "科技站废墟 1 奇遇",
-        hover = "控制科技站废墟 1；会生成树和农场建筑。",
+        hover = "控制科技站废墟 1；会生成树和农场建筑。物品/备注：箱子、草帽、干草叉；有成品科技站。",
         options =
         {
             { description = "开启", data = true, hover = "保留科技站废墟 1。" },
@@ -461,7 +461,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_researchlab2",
         label = "科技站废墟 2 奇遇",
-        hover = "控制科技站废墟 2；会生成树。",
+        hover = "控制科技站废墟 2；会生成树。物品/备注：牛帽、斧头、猪头、木墙；有成品科技站。",
         options =
         {
             { description = "开启", data = true, hover = "保留科技站废墟 2。" },
@@ -472,7 +472,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_researchlab3",
         label = "科技站废墟 3 奇遇",
-        hover = "控制科技站废墟 3；会生成浆果丛、树苗、蜂箱和树。",
+        hover = "控制科技站废墟 3；会生成浆果丛、树苗、蜂箱和树。物品/备注：箱子、金镐、矿工帽、石墙；这是有锅的彩蛋之一。",
         options =
         {
             { description = "开启", data = true, hover = "保留科技站废墟 3。" },
@@ -483,7 +483,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_hunter_swamp",
         label = "沼泽猎人触手奇遇",
-        hover = "控制沼泽猎人骸骨；该布局会生成触手。",
+        hover = "控制沼泽猎人骸骨；该布局会生成触手。物品/备注：牛帽、牛毛、骨头、狗牙、长矛；触手 x19。",
         options =
         {
             { description = "开启", data = true, hover = "保留沼泽猎人触手布局。" },
@@ -494,7 +494,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_wizard_ice",
         label = "冰法师骸骨树木奇遇",
-        hover = "控制冰法师骸骨中的树木布局。",
+        hover = "控制冰法师骸骨中的树木布局。物品/备注：冰杖、胡须、骨头、冬象背心。",
         options =
         {
             { description = "开启", data = true, hover = "保留冰法师骸骨树木。" },
@@ -505,7 +505,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_wizard_fire",
         label = "火法师骸骨树木奇遇",
-        hover = "控制火法师骸骨中的树木布局。",
+        hover = "控制火法师骸骨中的树木布局。物品/备注：火杖、灰烬、胡须、火药、骨头。",
         options =
         {
             { description = "开启", data = true, hover = "保留火法师骸骨树木。" },
@@ -516,7 +516,7 @@ configuration_options =
     {
         name = "setpiece_skeleton_lightfarmer",
         label = "荧光花农夫骸骨奇遇",
-        hover = "控制洞穴泥地的发光农夫骸骨；会生成荧光花、双朵荧光花和三朵荧光花。",
+        hover = "控制洞穴泥地的发光农夫骸骨；会生成荧光花、双朵荧光花和三朵荧光花。物品/备注：灯笼、干草叉。",
         options =
         {
             { description = "开启", data = true, hover = "保留荧光花农夫骸骨布局。" },
@@ -527,7 +527,7 @@ configuration_options =
     {
         name = "setpiece_lures_and_worms",
         label = "发光浆果蠕虫奇遇",
-        hover = "控制洞穴泥地的发光浆果与蠕虫守护布局；会生成发光浆果植株和洞穴蠕虫生成点。",
+        hover = "控制洞穴泥地的发光浆果与蠕虫守护布局；会生成发光浆果植株和洞穴蠕虫生成点。物品/备注：发光浆果植株、蠕虫生成点。",
         options =
         {
             { description = "开启", data = true, hover = "保留发光浆果蠕虫布局。" },
