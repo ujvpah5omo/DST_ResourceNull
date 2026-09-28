@@ -39,7 +39,7 @@ end
 
 name = Text("无资源设定修正", "Resource Null Fix")
 author = "Codex"
-version = "0.1.26"
+version = "0.1.27"
 forumthread = "https://steamcommunity.com/sharedfiles/filedetails/?id=3789775647"
 api_version = 10
 api_version_dst = 10
@@ -52,6 +52,8 @@ all_clients_require_mod = true
 client_only_mod = false
 server_only_mod = false
 priority = 0
+icon_atlas = "modicon.xml"
+icon = "modicon.tex"
 server_filter_tags = { "resource-null-fix", "resource-null", "worldgen", "setpiece", "dst" }
 
 description = Text([[
