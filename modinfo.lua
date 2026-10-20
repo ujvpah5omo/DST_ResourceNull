@@ -39,7 +39,7 @@ end
 
 name = Text("无资源设定修正", "Resource Null Fix")
 author = "Codex"
-version = "0.1.27"
+version = "0.1.28"
 forumthread = "https://steamcommunity.com/sharedfiles/filedetails/?id=3789775647"
 api_version = 10
 api_version_dst = 10
@@ -123,12 +123,15 @@ configuration_options =
     {
         name = "hunt_cooldown_multiplier",
         label = Text("狩猎刷新间隔", "Hunt Refresh Interval"),
-        hover = Hover("调整原版狩猎冷却时间；只影响新狩猎刷新间隔，不改变脚印数量和狩猎惊喜概率。", "Adjusts vanilla hunt cooldown. Only affects how often new hunts refresh, not track count or surprise chance."),
+        hover = Hover("调整正常狩猎冷却，不改变脚印数量和惊喜概率。原版基础冷却：关闭不生成；较少 2.1-2.7 天；默认 0.9-1.5 天；较多 0.3-0.9 天；大量 0.1-0.5 天。倍率同时放大基础冷却及其波动；短暂重试计时不变。", "Adjusts normal hunt cooldown, not track count or surprise chance. Vanilla base cooldown: Never disables hunts; Rare 2.1-2.7 days; Default 0.9-1.5; Often 0.3-0.9; Lots 0.1-0.5. Multipliers scale both base cooldown and variation. Short retry timers are unchanged."),
         options =
         {
-            { description = Text("原版", "Default"), data = 1, hover = Hover("不调整原版狩猎冷却。", "Do not change vanilla hunt cooldown.") },
-            { description = Text("2 倍", "2x"), data = 2, hover = Hover("狩猎冷却时间翻倍；例如“较少”约从 2.1-2.7 天变为 4.2-5.4 天。", "Doubles hunt cooldown. For example, Rare changes from about 2.1-2.7 days to 4.2-5.4 days.") },
-            { description = Text("3 倍", "3x"), data = 3, hover = Hover("狩猎冷却时间变为三倍；例如“较少”约从 2.1-2.7 天变为 6.3-8.1 天。", "Triples hunt cooldown. For example, Rare changes from about 2.1-2.7 days to 6.3-8.1 days.") },
+            { description = Text("原版", "Default"), data = 1, hover = Hover("基础冷却：关闭不生成；较少 2.1-2.7 天；默认 0.9-1.5 天；较多 0.3-0.9 天；大量 0.1-0.5 天。", "Base cooldown: Never disables hunts; Rare 2.1-2.7 days; Default 0.9-1.5; Often 0.3-0.9; Lots 0.1-0.5.") },
+            { description = Text("2 倍", "2x"), data = 2, hover = Hover("正常狩猎冷却变为原版的 2 倍。", "Multiplies normal vanilla hunt cooldown by 2.") },
+            { description = Text("3 倍", "3x"), data = 3, hover = Hover("正常狩猎冷却变为原版的 3 倍。", "Multiplies normal vanilla hunt cooldown by 3.") },
+            { description = Text("4 倍", "4x"), data = 4, hover = Hover("正常狩猎冷却变为原版的 4 倍。", "Multiplies normal vanilla hunt cooldown by 4.") },
+            { description = Text("5 倍", "5x"), data = 5, hover = Hover("正常狩猎冷却变为原版的 5 倍。", "Multiplies normal vanilla hunt cooldown by 5.") },
+            { description = Text("随机（2-5 倍）", "Random (2-5x)"), data = "random", hover = Hover("每轮安排正常狩猎冷却时，重新等概率抽取 2、3、4、5 倍之一；短暂重试不受影响。", "Each time a normal hunt cooldown is scheduled, independently picks 2x, 3x, 4x, or 5x with equal probability. Short retries are unaffected.") },
         },
         default = 1,
     },

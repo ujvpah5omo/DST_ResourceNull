@@ -676,6 +676,10 @@ local function IsHuntBeefaloThreat(prefab)
 end
 
 local function ApplyHuntCooldownMultiplier()
+    if IsCave() or _G.TheWorld.resource_null_hunt_cooldown_multiplier_applied then
+        return
+    end
+
     local multiplier = GetModConfigData("hunt_cooldown_multiplier")
     if type(multiplier) ~= "number"
         or multiplier <= 1
@@ -694,6 +698,33 @@ local function ApplyHuntCooldownMultiplier()
         _G.TUNING.HUNT_COOLDOWNDEVIATION = _G.TUNING.HUNT_COOLDOWNDEVIATION * multiplier
     end
 end
+
+AddComponentPostInit("hunter", function(self)
+    if GetModConfigData("hunt_cooldown_multiplier") ~= "random" or IsCave() then
+        return
+    end
+
+    -- StartCooldown is shared by hunt completion, initialization, and retries.
+    local debug = _G.debug
+    for i = 1, 100 do
+        local name, original = debug.getupvalue(self.OnDirtInvestigated, i)
+        if name == nil then
+            break
+        end
+        if name == "StartCooldown" then
+            debug.setupvalue(self.OnDirtInvestigated, i, function(inst, hunt, cooldown)
+                if cooldown == nil then
+                    cooldown = _G.TUNING.HUNT_COOLDOWN
+                        + _G.TUNING.HUNT_COOLDOWNDEVIATION * (math.random() * 2 - 1)
+                elseif cooldown == _G.TUNING.HUNT_RESET_TIME or cooldown == 0.1 then
+                    return original(inst, hunt, cooldown)
+                end
+                return original(inst, hunt, cooldown * math.random(2, 5))
+            end)
+            break
+        end
+    end
+end)
 
 local function IsSafeHuntSpawnPoint(x, y, z)
     return _G.TheWorld == nil
