@@ -39,7 +39,7 @@ end
 
 name = Text("无资源设定修正", "Resource Null Fix")
 author = "Codex"
-version = "0.1.29"
+version = "0.1.30"
 forumthread = "https://steamcommunity.com/sharedfiles/filedetails/?id=3789775647"
 api_version = 10
 api_version_dst = 10
@@ -87,7 +87,7 @@ configuration_options =
     {
         name = "ocean_fishingrod_durability",
         label = Text("海钓竿耐久", "Sea Fishing Rod Durability"),
-        hover = Hover("开启后，海钓竿使用淡水钓竿的耐久次数，每次成功收鱼消耗 1 次，耗尽后损坏并掉出浮标和鱼饵。", "Uses the freshwater fishing rod's durability limit. Each successful catch costs one use. When depleted, the rod breaks and drops its tackle."),
+        hover = Hover("开启后，海钓竿使用淡水钓竿的耐久次数。无论是否安装浮标和鱼饵，钓起鱼或垃圾，以及钩住后脱钩、断线或中断，均消耗 1 次；空钩收竿不消耗。耗尽后损坏并掉出浮标和鱼饵。", "Uses the freshwater rod's durability limit. With or without tackle, catching fish or junk, or losing an hooked catch through escape, line break or interruption costs one use. Retrieving an empty hook costs nothing. The rod breaks and drops its tackle when depleted."),
         options = OnOffOptions("使用与淡水钓竿相同的耐久。", "Use freshwater fishing rod durability.", "保留原版海钓竿无耐久的设定。", "Keep the vanilla sea fishing rod without durability."),
         default = false,
     },

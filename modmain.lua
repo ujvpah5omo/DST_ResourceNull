@@ -20,29 +20,18 @@ AddPrefabPostInit("oceanfishingrod", function(inst)
         end)
     end)
 
-    local oncatch = function()
-        inst.components.finiteuses:Use(1)
-    end
     local fishing = inst.components.oceanfishingrod
-    local oncast = fishing.oncastfn
-    fishing.oncastfn = function(rod, fisher, ...)
-        if rod.resource_null_fisher ~= nil then
-            rod:RemoveEventCallback("fishcaught", oncatch, rod.resource_null_fisher)
-        end
-        rod.resource_null_fisher = fisher
-        rod:ListenForEvent("fishcaught", oncatch, fisher)
-        if oncast ~= nil then
-            return oncast(rod, fisher, ...)
-        end
-    end
     local ondone = fishing.ondonefishing
-    fishing.ondonefishing = function(rod, ...)
-        if rod.resource_null_fisher ~= nil then
-            rod:RemoveEventCallback("fishcaught", oncatch, rod.resource_null_fisher)
-            rod.resource_null_fisher = nil
+    fishing.ondonefishing = function(rod, reason, lost_tackle, fisher, target)
+        local had_catch = target ~= nil
+            and target.components.oceanfishable ~= nil
+            and target.components.oceanfishinghook == nil
+            and not target:HasTag("projectile")
+        if reason == "success" or had_catch then
+            rod.components.finiteuses:Use(1)
         end
         if ondone ~= nil then
-            return ondone(rod, ...)
+            return ondone(rod, reason, lost_tackle, fisher, target)
         end
     end
 end)
