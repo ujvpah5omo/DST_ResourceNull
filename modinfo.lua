@@ -39,7 +39,7 @@ end
 
 name = Text("无资源设定修正", "Resource Null Fix")
 author = "Codex"
-version = "0.1.28"
+version = "0.1.29"
 forumthread = "https://steamcommunity.com/sharedfiles/filedetails/?id=3789775647"
 api_version = 10
 api_version_dst = 10
