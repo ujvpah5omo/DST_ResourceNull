@@ -85,6 +85,13 @@ https://steamcommunity.com/sharedfiles/filedetails/?id=3789775647
 configuration_options =
 {
     {
+        name = "ocean_fishingrod_durability",
+        label = Text("海钓竿耐久", "Sea Fishing Rod Durability"),
+        hover = Hover("开启后，海钓竿使用淡水钓竿的耐久次数，每次成功收鱼消耗 1 次，耗尽后损坏并掉出浮标和鱼饵。", "Uses the freshwater fishing rod's durability limit. Each successful catch costs one use. When depleted, the rod breaks and drops its tackle."),
+        options = OnOffOptions("使用与淡水钓竿相同的耐久。", "Use freshwater fishing rod durability.", "保留原版海钓竿无耐久的设定。", "Keep the vanilla sea fishing rod without durability."),
+        default = false,
+    },
+    {
         name = "celestial_orb_compensation",
         label = Text("天体宝球补偿", "Celestial Orb Compensation"),
         hover = Hover("开启后，关闭陨石且世界没有天体宝球入口时，补一个大陆陨石区的可疑月岩矿。", "When enabled, if meteors are disabled and the world has no Celestial Orb entry, adds a suspicious moonrock boulder in a mainland meteor area."),

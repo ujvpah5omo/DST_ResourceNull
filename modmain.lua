@@ -1,5 +1,52 @@
 local _G = GLOBAL
 
+AddPrefabPostInit("oceanfishingrod", function(inst)
+    if not _G.TheWorld.ismastersim or not GetModConfigData("ocean_fishingrod_durability") then
+        return
+    end
+
+    if inst.components.finiteuses == nil then
+        inst:AddComponent("finiteuses")
+        inst.components.finiteuses:SetMaxUses(_G.TUNING.FISHINGROD_USES)
+        inst.components.finiteuses:SetUses(_G.TUNING.FISHINGROD_USES)
+    end
+    inst.components.finiteuses:SetOnFinished(function(rod)
+        -- Let CatchFish finish cleaning up before removing the equipped rod.
+        rod:DoTaskInTime(0, function()
+            if rod.components.container ~= nil then
+                rod.components.container:DropEverything()
+            end
+            rod:Remove()
+        end)
+    end)
+
+    local oncatch = function()
+        inst.components.finiteuses:Use(1)
+    end
+    local fishing = inst.components.oceanfishingrod
+    local oncast = fishing.oncastfn
+    fishing.oncastfn = function(rod, fisher, ...)
+        if rod.resource_null_fisher ~= nil then
+            rod:RemoveEventCallback("fishcaught", oncatch, rod.resource_null_fisher)
+        end
+        rod.resource_null_fisher = fisher
+        rod:ListenForEvent("fishcaught", oncatch, fisher)
+        if oncast ~= nil then
+            return oncast(rod, fisher, ...)
+        end
+    end
+    local ondone = fishing.ondonefishing
+    fishing.ondonefishing = function(rod, ...)
+        if rod.resource_null_fisher ~= nil then
+            rod:RemoveEventCallback("fishcaught", oncatch, rod.resource_null_fisher)
+            rod.resource_null_fisher = nil
+        end
+        if ondone ~= nil then
+            return ondone(rod, ...)
+        end
+    end
+end)
+
 PrefabFiles =
 {
     "resource_null_lunar_warg_clue",
