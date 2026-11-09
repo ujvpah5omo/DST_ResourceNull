@@ -39,7 +39,7 @@ end
 
 name = Text("无资源设定修正", "Resource Null Fix")
 author = "Codex"
-version = "0.1.30"
+version = "0.1.31"
 forumthread = "https://steamcommunity.com/sharedfiles/filedetails/?id=3789775647"
 api_version = 10
 api_version_dst = 10
@@ -64,6 +64,7 @@ description = Text([[
 - 月亮裂隙后补偿月化座狼入口。
 - 春季雨天草原狩猎可触发小皮弗娄牛惊喜。
 - 可调整狩猎刷新间隔。
+- 可单独设置垃圾堆翻出的蜘蛛、蜘蛛战士、浣猫和鼹鼠。默认允许，保留原版掉率，不恢复巢穴或自然刷新。
 - 可控制补给、骸骨和资源类奇遇的原版、优先、必出或关闭状态。
 
 Steam Workshop:
@@ -76,14 +77,33 @@ Features:
 - Adds a lunar warg entry after lunar rifts become available.
 - Adds a spring-rain savanna hunt surprise with a baby beefalo.
 - Allows longer hunt refresh intervals.
+- Independently controls spiders, spider warriors, catcoons, and moleworms from junk piles. All are allowed by default at vanilla odds, without restoring dens or natural spawns.
 - Controls boon, skeleton, and resource-related setpieces with Default, Priority, Force 1, or Off modes.
 
 Steam Workshop:
 https://steamcommunity.com/sharedfiles/filedetails/?id=3789775647
 ]])
 
+local function JunkCritterOption(prefab, zh, en)
+    return {
+        name = "junk_critter_" .. prefab,
+        label = Text("垃圾堆：" .. zh, "Junk Piles: " .. en),
+        hover = Hover("仅控制垃圾堆翻找时是否生成该生物，抽选权重不变。", "Controls whether this creature can emerge from junk piles. Its roll weight is unchanged."),
+        options = {
+            { description = Text("原版", "Vanilla"), data = "vanilla", hover = Hover("跟随原版世界设置。", "Follow vanilla world settings.") },
+            { description = Text("允许", "Allow"), data = "allow", hover = Hover("即使世界设置禁用，也允许从垃圾堆翻出。", "Allow junk piles to spawn it even when disabled in world settings.") },
+            { description = Text("禁止", "Block"), data = "block", hover = Hover("抽中时不生成，也不重抽。", "Skip spawning on a matching roll without rerolling.") },
+        },
+        default = "allow",
+    }
+end
+
 configuration_options =
 {
+    JunkCritterOption("spider", "蜘蛛", "Spider"),
+    JunkCritterOption("spider_warrior", "蜘蛛战士", "Spider Warrior"),
+    JunkCritterOption("catcoon", "浣猫", "Catcoon"),
+    JunkCritterOption("mole", "鼹鼠", "Moleworm"),
     {
         name = "ocean_fishingrod_durability",
         label = Text("海钓竿耐久", "Sea Fishing Rod Durability"),

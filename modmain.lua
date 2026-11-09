@@ -1,5 +1,16 @@
 local _G = GLOBAL
 
+local junk_common = _G.require("prefabs/junk_pile_common")
+for _, choice in ipairs(junk_common.LOOT.CRITTERS) do
+    local mode = GetModConfigData("junk_critter_" .. choice.prefab)
+    if mode == "allow" or mode == "block" then
+        -- The weighted table uses these same entries as keys.
+        local key = "RESOURCE_NULL_JUNK_" .. choice.prefab
+        _G.TUNING[key] = mode == "allow"
+        choice.enabled_tuning = key
+    end
+end
+
 AddPrefabPostInit("oceanfishingrod", function(inst)
     if not _G.TheWorld.ismastersim or not GetModConfigData("ocean_fishingrod_durability") then
         return
